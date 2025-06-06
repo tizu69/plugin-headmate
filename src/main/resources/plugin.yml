@@ -1,0 +1,7 @@
+name: headmate
+version: 1.0.0
+main: dev.tizu.headmate.ThisPlugin
+description: Place heads the way you mate
+author: tizu.dev
+website: https://tizu.dev
+api-version: "1.21.5"

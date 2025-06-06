@@ -1,0 +1,22 @@
+on:
+  - push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: "temurin"
+          architecture: x64
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Build with Gradle
+        run: ./gradlew jar
+      - name: Upload jar
+        uses: actions/upload-artifact@v4
+        with:
+          name: headmate.jar
+          path: build/libs/headmate.jar
