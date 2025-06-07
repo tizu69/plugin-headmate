@@ -32,7 +32,7 @@ public class ThisPlugin extends JavaPlugin implements Listener {
             return;
 
         var isHeadmate = HeadmateStore.has(block);
-        var addNewHead = head.getData(DataComponentTypes.PROFILE) != null;
+        var handHeadHasSkin = head.getData(DataComponentTypes.PROFILE) != null;
         if (!isHeadmate && block.getType() != Material.PLAYER_HEAD
                 && block.getType() != Material.PLAYER_WALL_HEAD)
             return;
@@ -48,17 +48,18 @@ public class ThisPlugin extends JavaPlugin implements Listener {
             event.getPlayer().spawnParticle(Particle.ENCHANT, block.getLocation()
                     .add(0.5, 0.5, 0.5), 1000);
             event.setCancelled(true);
-            if (addNewHead)
+            if (handHeadHasSkin)
                 player.sendActionBar(Component.text(
                         "Shift-click again to add the head you're holding!", NamedTextColor.GRAY));
             return;
         }
 
-        if (addNewHead) {
+        if (handHeadHasSkin) {
             HeadmateStore.add(block, head.getData(DataComponentTypes.PROFILE), player.getYaw());
             if (player.getGameMode() == GameMode.SURVIVAL)
                 player.getInventory().removeItem(head);
             event.setCancelled(true);
+            return;
         }
     }
 
