@@ -35,10 +35,10 @@ public class HeadmateStore {
 
         var skull = (Skull) block.getState();
         block.setType(Material.BARRIER);
-        HeadmateStore.add(block, skull.getPlayerProfile());
+        HeadmateStore.add(block, ResolvableProfile.resolvableProfile(skull.getPlayerProfile()));
     }
 
-    public static void add(Block block, PlayerProfile profile) {
+    public static void add(Block block, ResolvableProfile profile) {
         var pdc = block.getChunk().getPersistentDataContainer();
         var list = pdc.get(getKey(block), PersistentDataType.LIST.strings());
         if (list == null)
@@ -50,8 +50,7 @@ public class HeadmateStore {
         // transfer the player head to the item display
         var item = new ItemStack(Material.PLAYER_HEAD);
         if (profile != null)
-            item.setData(DataComponentTypes.PROFILE,
-                    ResolvableProfile.resolvableProfile(profile));
+            item.setData(DataComponentTypes.PROFILE, profile);
 
         var entity = world.spawnEntity(loc, EntityType.ITEM_DISPLAY, SpawnReason.CUSTOM, (e) -> {
             var id = (ItemDisplay) e;
