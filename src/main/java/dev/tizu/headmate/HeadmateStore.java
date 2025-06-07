@@ -72,6 +72,11 @@ public class HeadmateStore {
         var pdc = block.getChunk().getPersistentDataContainer();
         var list = pdc.get(getKey(block), PersistentDataType.LIST.strings());
         list.remove(uuid.toString());
+
+        var entity = block.getWorld().getEntity(uuid);
+        if (entity != null)
+            entity.remove();
+
         if (list.isEmpty()) {
             // yes, this will retry removing all heads, but worth it for only one cleanup
             // task
