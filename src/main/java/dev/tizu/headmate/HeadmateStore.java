@@ -64,6 +64,19 @@ public class HeadmateStore {
         pdc.set(getKey(block), PersistentDataType.LIST.strings(), list);
     }
 
+    public static void remove(Block block, UUID uuid) {
+        var pdc = block.getChunk().getPersistentDataContainer();
+        var list = pdc.get(getKey(block), PersistentDataType.LIST.strings());
+        list.remove(uuid.toString());
+        if (list.isEmpty()) {
+            // yes, this will retry removing all heads, but worth it for only one cleanup
+            // task
+            removeAll(block);
+            return;
+        }
+        pdc.set(getKey(block), PersistentDataType.LIST.strings(), list);
+    }
+
     public static void removeAll(Block block) {
         var pdc = block.getChunk().getPersistentDataContainer();
         var list = pdc.get(getKey(block), PersistentDataType.LIST.strings());
