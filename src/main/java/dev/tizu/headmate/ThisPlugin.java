@@ -8,8 +8,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import dev.tizu.headmate.ui.MenuList;
+import dev.tizu.headmate.ui.Menu;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;;
@@ -65,6 +68,9 @@ public class ThisPlugin extends JavaPlugin implements Listener {
             event.setCancelled(true);
             return;
         }
+
+        event.setCancelled(true);
+        player.openInventory(new MenuList(block).getInventory());
     }
 
     @EventHandler
@@ -82,5 +88,13 @@ public class ThisPlugin extends JavaPlugin implements Listener {
         }
 
         HeadmateStore.removeAll(block);
+    }
+
+    @EventHandler
+    public void onInventoryClick(InventoryClickEvent event) {
+        var inventory = event.getClickedInventory();
+        if (inventory == null || !(inventory.getHolder(false) instanceof Menu menu))
+            return;
+        menu.onInventoryClick(event);
     }
 }
