@@ -33,10 +33,11 @@ public class HeadmateStore {
 
         var skull = (Skull) block.getState();
         block.setType(Material.BARRIER);
-        HeadmateStore.add(block, ResolvableProfile.resolvableProfile(skull.getPlayerProfile()));
+        HeadmateStore.add(block, ResolvableProfile.resolvableProfile(skull.getPlayerProfile()),
+                new Vector3f(0.5f, 0.5f, 0.5f), Transformers.getRot(skull.getBlockData()));
     }
 
-    public static void add(Block block, ResolvableProfile profile) {
+    public static void add(Block block, ResolvableProfile profile, Vector3f position, AxisAngle4f rotation) {
         var pdc = block.getChunk().getPersistentDataContainer();
 
         var list = pdc.get(getKey(block), PersistentDataType.LIST.strings());
@@ -53,12 +54,16 @@ public class HeadmateStore {
         var entity = world.spawnEntity(loc, EntityType.ITEM_DISPLAY, SpawnReason.CUSTOM, (e) -> {
             var id = (ItemDisplay) e;
             id.setItemStack(item);
-            id.setTransformation(new Transformation(new Vector3f(0.5f, 0.5f, 0.5f),
-                    new AxisAngle4f(0, 0, 0, 0), new Vector3f(1, 1, 1),
-                    Maths.fromEuler(0, 45, 0)));
+            id.setTransformation(new Transformation(position, rotation,
+                    new Vector3f(1, 1, 1), new AxisAngle4f(0, 0, 0, 0)));
         });
         list.add(entity.getUniqueId().toString());
         pdc.set(getKey(block), PersistentDataType.LIST.strings(), list);
+    }
+
+    public static void add(Block block, ResolvableProfile profile) {
+        HeadmateStore.add(block, profile, new Vector3f(0.5f, 0.5f, 0.5f),
+                Transformers.getRot(0));
     }
 
     public static void remove(Block block, UUID uuid) {
