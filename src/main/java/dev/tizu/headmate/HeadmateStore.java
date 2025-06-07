@@ -16,6 +16,8 @@ import org.bukkit.util.Transformation;
 import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
 
+import com.destroystokyo.paper.profile.PlayerProfile;
+
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.ResolvableProfile;
 
@@ -33,10 +35,10 @@ public class HeadmateStore {
 
         var skull = (Skull) block.getState();
         block.setType(Material.BARRIER);
-        HeadmateStore.add(block, skull);
+        HeadmateStore.add(block, skull.getPlayerProfile());
     }
 
-    public static void add(Block block, Skull skull) {
+    public static void add(Block block, PlayerProfile profile) {
         var pdc = block.getChunk().getPersistentDataContainer();
         var list = pdc.get(getKey(block), PersistentDataType.LIST.strings());
         if (list == null)
@@ -47,9 +49,9 @@ public class HeadmateStore {
 
         // transfer the player head to the item display
         var item = new ItemStack(Material.PLAYER_HEAD);
-        if (skull.hasOwner())
+        if (profile != null)
             item.setData(DataComponentTypes.PROFILE,
-                    ResolvableProfile.resolvableProfile(skull.getPlayerProfile()));
+                    ResolvableProfile.resolvableProfile(profile));
 
         var entity = world.spawnEntity(loc, EntityType.ITEM_DISPLAY, SpawnReason.CUSTOM, (e) -> {
             var id = (ItemDisplay) e;
