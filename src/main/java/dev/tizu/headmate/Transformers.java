@@ -1,8 +1,5 @@
 package dev.tizu.headmate;
 
-import java.util.List;
-
-import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
@@ -11,26 +8,8 @@ import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
 
 public class Transformers {
-    private final static List<AxisAngle4f> rotations = List.of(
-            Maths.fromEuler(0, 0f, 0),
-            Maths.fromEuler(0, 22.5f, 0),
-            Maths.fromEuler(0, 45f, 0),
-            Maths.fromEuler(0, 67.5f, 0),
-            Maths.fromEuler(0, 90f, 0),
-            Maths.fromEuler(0, 112.5f, 0),
-            Maths.fromEuler(0, 135f, 0),
-            Maths.fromEuler(0, 157.5f, 0),
-            Maths.fromEuler(0, 180f, 0),
-            Maths.fromEuler(0, 202.5f, 0),
-            Maths.fromEuler(0, 225f, 0),
-            Maths.fromEuler(0, 247.5f, 0),
-            Maths.fromEuler(0, 270f, 0),
-            Maths.fromEuler(0, 292.5f, 0),
-            Maths.fromEuler(0, 315f, 0),
-            Maths.fromEuler(0, 337.5f, 0));
-
     public static AxisAngle4f getRot(int index) {
-        return rotations.get(index % rotations.size());
+        return Maths.fromEuler(0, ((index * 22.5f) % 360) - 180, 0);
     }
 
     public static AxisAngle4f getRot(BlockData blockdata) {
@@ -42,43 +21,34 @@ public class Transformers {
         else
             return getRot(0);
 
-        switch (face) {
-            case NORTH:
-                return rotations.get(0);
-            case NORTH_NORTH_WEST:
-                return rotations.get(1);
-            case NORTH_WEST:
-                return rotations.get(2);
-            case WEST_NORTH_WEST:
-                return rotations.get(3);
-            case WEST:
-                return rotations.get(4);
-            case WEST_SOUTH_WEST:
-                return rotations.get(5);
-            case SOUTH_WEST:
-                return rotations.get(6);
-            case SOUTH_SOUTH_WEST:
-                return rotations.get(7);
-            case SOUTH:
-                return rotations.get(8);
-            case SOUTH_SOUTH_EAST:
-                return rotations.get(9);
-            case SOUTH_EAST:
-                return rotations.get(10);
-            case EAST_SOUTH_EAST:
-                return rotations.get(11);
-            case EAST:
-                return rotations.get(12);
-            case EAST_NORTH_EAST:
-                return rotations.get(13);
-            case NORTH_EAST:
-                return rotations.get(14);
-            case NORTH_NORTH_EAST:
-                return rotations.get(15);
-            default:
-                return rotations.get(0);
-        }
+        return switch (face) {
+            case SOUTH -> getRot(0);
+            case SOUTH_SOUTH_EAST -> getRot(1);
+            case SOUTH_EAST -> getRot(2);
+            case EAST_SOUTH_EAST -> getRot(3);
+            case EAST -> getRot(4);
+            case EAST_NORTH_EAST -> getRot(5);
+            case NORTH_EAST -> getRot(6);
+            case NORTH_NORTH_EAST -> getRot(7);
+            case NORTH -> getRot(8);
+            case NORTH_NORTH_WEST -> getRot(9);
+            case NORTH_WEST -> getRot(10);
+            case WEST_NORTH_WEST -> getRot(11);
+            case WEST -> getRot(12);
+            case WEST_SOUTH_WEST -> getRot(13);
+            case SOUTH_WEST -> getRot(14);
+            case SOUTH_SOUTH_WEST -> getRot(15);
+            default -> getRot(0);
+        };
     }
+
+    public static AxisAngle4f getRot(float yaw) {
+        // being drunk is fun (i wasnt drunk but feels like it, wtf did i do)
+        float normalizedYaw = yaw < 0 ? yaw + 360 : yaw;
+        float flippedYaw = (540 - normalizedYaw) % 360;
+        int index = (int) Math.floor((flippedYaw + 11.25f) / 22.5f) % 16;
+        return getRot(index);
+    }    
 
     public static Vector3f getPos(BlockData blockdata) {
         // for wall heads, attach to the wall

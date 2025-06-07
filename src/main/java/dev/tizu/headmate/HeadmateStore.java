@@ -62,9 +62,9 @@ public class HeadmateStore {
         pdc.set(getKey(block), PersistentDataType.LIST.strings(), list);
     }
 
-    public static void add(Block block, ResolvableProfile profile) {
+    public static void add(Block block, ResolvableProfile profile, float yaw) {
         HeadmateStore.add(block, profile, new Vector3f(0.5f, 0.5f, 0.5f),
-                Transformers.getRot(0));
+                Transformers.getRot(yaw));
     }
 
     public static void remove(Block block, UUID uuid) {
