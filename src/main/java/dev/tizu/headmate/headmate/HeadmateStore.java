@@ -1,4 +1,4 @@
-package dev.tizu.headmate.backend;
+package dev.tizu.headmate.headmate;
 
 import java.util.ArrayList;
 import java.util.UUID;

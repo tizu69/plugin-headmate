@@ -3,8 +3,8 @@ package dev.tizu.headmate;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import dev.tizu.headmate.backend.HeadmateListener;
-import dev.tizu.headmate.ui.Menu;
+import dev.tizu.headmate.headmate.HeadmateListener;
+import dev.tizu.headmate.menu.Menu;
 
 public class ThisPlugin extends JavaPlugin {
     public static ThisPlugin instance;

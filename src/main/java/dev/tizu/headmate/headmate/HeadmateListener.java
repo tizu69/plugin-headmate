@@ -1,4 +1,4 @@
-package dev.tizu.headmate.backend;
+package dev.tizu.headmate.headmate;
 
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -8,7 +8,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 
-import dev.tizu.headmate.ui.MenuList;
+import dev.tizu.headmate.menu.MenuList;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;

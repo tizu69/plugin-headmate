@@ -1,4 +1,4 @@
-package dev.tizu.headmate.ui;
+package dev.tizu.headmate.menu;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
