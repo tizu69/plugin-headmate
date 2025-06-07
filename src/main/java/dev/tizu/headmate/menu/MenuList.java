@@ -3,10 +3,12 @@ package dev.tizu.headmate.menu;
 import java.util.List;
 
 import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 
 import dev.tizu.headmate.ThisPlugin;
+import dev.tizu.headmate.editor.Editor;
 import dev.tizu.headmate.headmate.HeadmateStore;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.ItemLore;
@@ -44,6 +46,7 @@ public class MenuList implements Menu {
 
     public void onInventoryClick(InventoryClickEvent event) {
         var inventory = event.getClickedInventory();
+        var player = (Player) event.getWhoClicked();
         event.setCancelled(true);
 
         var headmates = HeadmateStore.getHeads(block);
@@ -59,6 +62,9 @@ public class MenuList implements Menu {
             if (headmates.length == 1)
                 this.inv.close();
             render();
+        } else if (!event.isShiftClick() && event.isLeftClick()) {
+            this.inv.close();
+            Editor.startEditing(player, headmates[slot]);
         }
     }
 

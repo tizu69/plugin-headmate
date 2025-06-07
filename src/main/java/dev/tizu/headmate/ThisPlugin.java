@@ -3,6 +3,7 @@ package dev.tizu.headmate;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import dev.tizu.headmate.editor.EditorListener;
 import dev.tizu.headmate.headmate.HeadmateListener;
 import dev.tizu.headmate.menu.Menu;
 
@@ -12,6 +13,7 @@ public class ThisPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
+        Bukkit.getPluginManager().registerEvents(new EditorListener(), this);
         Bukkit.getPluginManager().registerEvents(new HeadmateListener(), this);
         Bukkit.getPluginManager().registerEvents(new Menu.MenuListener(), this);
     }
