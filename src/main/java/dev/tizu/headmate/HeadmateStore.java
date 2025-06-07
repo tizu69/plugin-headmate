@@ -32,9 +32,10 @@ public class HeadmateStore {
             throw new IllegalArgumentException("Invalid block type, got " + block.getType());
 
         var skull = (Skull) block.getState();
+        var blockdata = skull.getBlockData();
         block.setType(Material.BARRIER);
         HeadmateStore.add(block, ResolvableProfile.resolvableProfile(skull.getPlayerProfile()),
-                new Vector3f(0.5f, 0.5f, 0.5f), Transformers.getRot(skull.getBlockData()));
+                Transformers.getPos(blockdata), Transformers.getRot(blockdata));
     }
 
     public static void add(Block block, ResolvableProfile profile, Vector3f position, AxisAngle4f rotation) {

@@ -2,11 +2,13 @@ package dev.tizu.headmate;
 
 import java.util.List;
 
+import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
 import org.bukkit.block.data.Rotatable;
 import org.joml.AxisAngle4f;
+import org.joml.Vector3f;
 
 public class Transformers {
     private final static List<AxisAngle4f> rotations = List.of(
@@ -76,5 +78,13 @@ public class Transformers {
             default:
                 return rotations.get(0);
         }
+    }
+
+    public static Vector3f getPos(BlockData blockdata) {
+        // for wall heads, attach to the wall
+        if (blockdata instanceof Directional directional)
+            return directional.getFacing().getDirection().toVector3f()
+                    .mul(-0.25f).add(0.5f, 0.75f, 0.5f);
+        return new Vector3f(0.5f, 0.5f, 0.5f);
     }
 }
