@@ -33,8 +33,9 @@ public class HeadmateStore {
 
         var skull = (Skull) block.getState();
         var blockdata = skull.getBlockData();
+        var profile = skull.getPlayerProfile();
         block.setType(Material.BARRIER);
-        HeadmateStore.add(block, ResolvableProfile.resolvableProfile(skull.getPlayerProfile()),
+        HeadmateStore.add(block, profile != null ? ResolvableProfile.resolvableProfile(profile) : null,
                 Transformers.getPos(blockdata), Transformers.getRot(blockdata));
     }
 
