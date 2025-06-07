@@ -5,11 +5,12 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
 import org.bukkit.block.data.Rotatable;
 import org.joml.AxisAngle4f;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 public class Transformers {
     public static AxisAngle4f getRot(int index) {
-        return Maths.fromEuler(0, ((index * 22.5f) % 360) - 180, 0);
+        return Transformers.fromEuler(0, ((index * 22.5f) % 360) - 180, 0);
     }
 
     public static AxisAngle4f getRot(BlockData blockdata) {
@@ -56,5 +57,21 @@ public class Transformers {
             return directional.getFacing().getDirection().toVector3f()
                     .mul(-0.25f).add(0.5f, 0.75f, 0.5f);
         return new Vector3f(0.5f, 0.5f, 0.5f);
+    }
+
+    public static AxisAngle4f fromEuler(float pitch, float yaw, float roll) {
+        var xRad = (float) Math.toRadians(pitch);
+        var yRad = (float) Math.toRadians(yaw);
+        var zRad = (float) Math.toRadians(roll);
+
+        var qX = new Quaternionf().rotationX(xRad);
+        var qY = new Quaternionf().rotationY(yRad);
+        var qZ = new Quaternionf().rotationZ(zRad);
+        var combined = new Quaternionf();
+        combined.set(qY).mul(qX).mul(qZ);
+
+        var result = new AxisAngle4f();
+        combined.get(result);
+        return result;
     }
 }
