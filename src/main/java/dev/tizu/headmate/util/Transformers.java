@@ -1,4 +1,4 @@
-package dev.tizu.headmate;
+package dev.tizu.headmate.util;
 
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
@@ -48,7 +48,7 @@ public class Transformers {
         float flippedYaw = (540 - normalizedYaw) % 360;
         int index = (int) Math.floor((flippedYaw + 11.25f) / 22.5f) % 16;
         return getRot(index);
-    }    
+    }
 
     public static Vector3f getPos(BlockData blockdata) {
         // for wall heads, attach to the wall

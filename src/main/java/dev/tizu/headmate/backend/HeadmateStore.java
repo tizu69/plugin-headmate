@@ -1,4 +1,4 @@
-package dev.tizu.headmate;
+package dev.tizu.headmate.backend;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -16,6 +16,8 @@ import org.bukkit.util.Transformation;
 import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
 
+import dev.tizu.headmate.ThisPlugin;
+import dev.tizu.headmate.util.Transformers;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.ResolvableProfile;
 

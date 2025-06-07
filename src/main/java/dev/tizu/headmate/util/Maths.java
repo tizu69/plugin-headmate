@@ -1,4 +1,4 @@
-package dev.tizu.headmate;
+package dev.tizu.headmate.util;
 
 import org.joml.AxisAngle4f;
 import org.joml.Quaternionf;

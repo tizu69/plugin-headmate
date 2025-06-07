@@ -6,8 +6,8 @@ import org.bukkit.block.Block;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 
-import dev.tizu.headmate.HeadmateStore;
 import dev.tizu.headmate.ThisPlugin;
+import dev.tizu.headmate.backend.HeadmateStore;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.ItemLore;
 import net.kyori.adventure.text.Component;
