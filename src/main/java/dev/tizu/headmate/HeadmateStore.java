@@ -94,6 +94,25 @@ public class HeadmateStore {
         block.setType(Material.AIR);
     }
 
+    public static ItemDisplay[] getHeads(Block block) {
+        var pdc = block.getChunk().getPersistentDataContainer();
+        var list = pdc.get(getKey(block), PersistentDataType.LIST.strings());
+        var heads = new ItemDisplay[list.size()];
+        for (int i = 0; i < heads.length; i++) {
+            var uuid = UUID.fromString(list.get(i));
+            heads[i] = (ItemDisplay) block.getWorld().getEntity(uuid);
+        }
+        return heads;
+    }
+
+    public static final int PROPOSED_MAX_HEADS = 9;
+
+    public static int getCount(Block block) {
+        var pdc = block.getChunk().getPersistentDataContainer();
+        var list = pdc.get(getKey(block), PersistentDataType.LIST.strings());
+        return list == null ? 0 : list.size();
+    }
+
     private static NamespacedKey getKey(Block block) {
         return new NamespacedKey(ThisPlugin.instance,
                 "hm-" + block.getX() + "-" + block.getY() + "-" + block.getZ());

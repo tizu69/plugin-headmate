@@ -55,6 +55,10 @@ public class ThisPlugin extends JavaPlugin implements Listener {
         }
 
         if (handHeadHasSkin) {
+            if (HeadmateStore.getCount(block) >= HeadmateStore.PROPOSED_MAX_HEADS) {
+                player.sendActionBar(Component.text("Too many heads!", NamedTextColor.RED));
+                return;
+            }
             HeadmateStore.add(block, head.getData(DataComponentTypes.PROFILE), player.getYaw());
             if (player.getGameMode() == GameMode.SURVIVAL)
                 player.getInventory().removeItem(head);
