@@ -1,6 +1,7 @@
 package dev.tizu.headmate;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.event.EventHandler;
@@ -8,6 +9,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import com.destroystokyo.paper.profile.PlayerProfile;
 
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import net.kyori.adventure.text.Component;
@@ -47,7 +50,17 @@ public class ThisPlugin extends JavaPlugin implements Listener {
             event.getPlayer().spawnParticle(Particle.ENCHANT, block.getLocation()
                     .add(0.5, 0.5, 0.5), 1000);
             event.setCancelled(true);
+            if (addNewHead)
+                player.sendActionBar(Component.text(
+                        "Shift-click again to add the head you're holding!", NamedTextColor.GRAY));
             return;
+        }
+
+        if (addNewHead) {
+            HeadmateStore.add(block, head.getData(DataComponentTypes.PROFILE));
+            if (player.getGameMode() == GameMode.SURVIVAL)
+                player.getInventory().removeItem(head);
+            event.setCancelled(true);
         }
     }
 

@@ -16,8 +16,6 @@ import org.bukkit.util.Transformation;
 import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
 
-import com.destroystokyo.paper.profile.PlayerProfile;
-
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.ResolvableProfile;
 
@@ -40,9 +38,9 @@ public class HeadmateStore {
 
     public static void add(Block block, ResolvableProfile profile) {
         var pdc = block.getChunk().getPersistentDataContainer();
+
         var list = pdc.get(getKey(block), PersistentDataType.LIST.strings());
-        if (list == null)
-            list = new ArrayList<>();
+        list = new ArrayList<>(list == null ? new ArrayList<>() : list);
 
         var world = block.getWorld();
         var loc = block.getLocation();
