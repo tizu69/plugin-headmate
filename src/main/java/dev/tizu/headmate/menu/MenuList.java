@@ -62,7 +62,7 @@ public class MenuList implements Menu {
             if (headmates.length == 1)
                 this.inv.close();
             render();
-        } else if (!event.isShiftClick() && event.isLeftClick()) {
+        } else if (event.isLeftClick()) {
             this.inv.close();
             Editor.startEditing(player, block, headmates[slot]);
         }
