@@ -23,6 +23,8 @@ import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.ResolvableProfile;
 
 public class HeadmateStore {
+    public static final int PROPOSED_MAX_HEADS = 27;
+
     public static boolean has(Block block) {
         if (block.getType() != Material.BARRIER)
             return false;
@@ -127,8 +129,6 @@ public class HeadmateStore {
         }
         return heads;
     }
-
-    public static final int PROPOSED_MAX_HEADS = 18;
 
     public static int getCount(Block block) {
         var pdc = block.getChunk().getPersistentDataContainer();
