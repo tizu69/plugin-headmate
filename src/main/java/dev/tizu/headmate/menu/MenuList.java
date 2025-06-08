@@ -22,7 +22,7 @@ public class MenuList implements Menu {
 
     public MenuList(Block block) {
         this.inv = ThisPlugin.instance.getServer().createInventory(this,
-                1 * 9, Component.text("Merged Heads"));
+                Math.round(HeadmateStore.PROPOSED_MAX_HEADS / 9) * 9, Component.text("Merged Heads"));
         this.block = block;
         render();
     }

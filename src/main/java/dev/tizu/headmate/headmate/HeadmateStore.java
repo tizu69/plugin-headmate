@@ -127,7 +127,7 @@ public class HeadmateStore {
         return heads;
     }
 
-    public static final int PROPOSED_MAX_HEADS = 9;
+    public static final int PROPOSED_MAX_HEADS = 18;
 
     public static int getCount(Block block) {
         var pdc = block.getChunk().getPersistentDataContainer();
