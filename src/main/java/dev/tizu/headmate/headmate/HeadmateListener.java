@@ -63,7 +63,7 @@ public class HeadmateListener implements Listener {
             }
             HeadmateStore.add(block, head.getData(DataComponentTypes.PROFILE), player.getYaw());
             if (player.getGameMode() == GameMode.SURVIVAL)
-                player.getInventory().removeItem(head);
+                event.getItemInHand().subtract();
             event.setCancelled(true);
             return;
         }

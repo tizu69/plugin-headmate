@@ -8,6 +8,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.Skull;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.inventory.ItemStack;
@@ -76,16 +77,23 @@ public class HeadmateStore {
         list.remove(uuid.toString());
 
         var entity = block.getWorld().getEntity(uuid);
-        if (entity != null)
+        if (entity != null) {
             entity.remove();
+            var de = (ItemDisplay) entity;
+            block.getWorld().spawnEntity(de.getLocation(), EntityType.ITEM,
+                    SpawnReason.NATURAL, (e) -> {
+                        var item = (Item) e;
+                        item.setItemStack(de.getItemStack());
+                    });
+        }
 
+        pdc.set(getKey(block), PersistentDataType.LIST.strings(), list);
         if (list.isEmpty()) {
             // yes, this will retry removing all heads, but worth it for only one cleanup
             // task
             removeAll(block);
             return;
         }
-        pdc.set(getKey(block), PersistentDataType.LIST.strings(), list);
     }
 
     public static void removeAll(Block block) {
@@ -93,8 +101,15 @@ public class HeadmateStore {
         var list = pdc.get(getKey(block), PersistentDataType.LIST.strings());
         for (var uuid : list) {
             var entity = block.getWorld().getEntity(UUID.fromString(uuid));
-            if (entity != null)
+            if (entity != null) {
                 entity.remove();
+                var de = (ItemDisplay) entity;
+                block.getWorld().spawnEntity(de.getLocation(), EntityType.ITEM,
+                        SpawnReason.NATURAL, (e) -> {
+                            var item = (Item) e;
+                            item.setItemStack(de.getItemStack());
+                        });
+            }
         }
         pdc.remove(getKey(block));
         // TODO: drop the heads
