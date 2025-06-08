@@ -1,6 +1,5 @@
 package dev.tizu.headmate.menu;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.GameMode;
