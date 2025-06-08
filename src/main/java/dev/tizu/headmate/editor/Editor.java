@@ -84,7 +84,6 @@ public class Editor {
         transPos.add(Transformers.turnIntoGenericOffset(movementOffset, 0.0625f));
         transPos.min(new Vector3f(1));
         transPos.max(new Vector3f(-1));
-        player.sendActionBar(Component.text(transPos.toString() + " /// " + yaw));
         inst.head.setTransformation(new Transformation(transPos, trans.getLeftRotation(),
                 trans.getScale(), trans.getRightRotation()));
     }
