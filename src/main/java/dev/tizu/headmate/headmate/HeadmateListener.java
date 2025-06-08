@@ -44,7 +44,7 @@ public class HeadmateListener implements Listener {
             event.getPlayer().spawnParticle(Particle.ENCHANT, block.getLocation()
                     .add(0.5, 0.5, 0.5), 1000);
             event.setCancelled(true);
-            Editor.startEditing(player, display);
+            Editor.startEditing(player, block, display);
             return;
         }
 
@@ -57,7 +57,7 @@ public class HeadmateListener implements Listener {
             if (player.getGameMode() == GameMode.SURVIVAL)
                 event.getItemInHand().subtract();
             event.setCancelled(true);
-            Editor.startEditing(player, entity);
+            Editor.startEditing(player, block, entity);
             return;
         }
 

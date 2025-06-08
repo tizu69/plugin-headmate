@@ -5,10 +5,12 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Input;
+import org.bukkit.NamespacedKey;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.block.Block;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Transformation;
 import org.joml.Vector3d;
 import org.joml.Vector3f;
@@ -21,42 +23,47 @@ import net.kyori.adventure.text.format.NamedTextColor;
 public class Editor {
     private static Map<UUID, EditorInstance> playerEditings = new HashMap<>();
 
-    public static void startEditing(Player player, ItemDisplay head) {
-        if (Editor.isEditing(player))
-            stopEditing(player);
+    private static final NamespacedKey EDITING_KEY = new NamespacedKey(ThisPlugin.instance, "editing");
+    private static final float SCALE_INCREMENT = 1f / 4f;
 
-        var previousSlowness = player.getPotionEffect(PotionEffectType.SLOWNESS);
-        var previousJump = player.getPotionEffect(PotionEffectType.JUMP_BOOST);
-        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS,
-                PotionEffect.INFINITE_DURATION, 6, false, false, false));
-        player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP_BOOST,
-                PotionEffect.INFINITE_DURATION, 127, false, false, false));
+    public static void startEditing(Player player, Block block, ItemDisplay head) {
+        stopEditing(player);
 
-        var instance = new EditorInstance(head, previousSlowness, previousJump, EditorMode.MOVE, -1);
+        player.getAttribute(Attribute.MOVEMENT_SPEED)
+                .addModifier(new AttributeModifier(EDITING_KEY, -1, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
+        player.getAttribute(Attribute.JUMP_STRENGTH)
+                .addModifier(new AttributeModifier(EDITING_KEY, -1, AttributeModifier.Operation.MULTIPLY_SCALAR_1));
+
+        var canFly = player.getAllowFlight();
+        player.setAllowFlight(false);
+
+        var instance = new EditorInstance(block, head, EditorMode.MOVE, -1, canFly);
         playerEditings.put(player.getUniqueId(), instance);
         showHowTo(player);
     }
 
     public static void stopEditing(Player player) {
+        player.getAttribute(Attribute.MOVEMENT_SPEED).removeModifier(EDITING_KEY);
+        player.getAttribute(Attribute.JUMP_STRENGTH).removeModifier(EDITING_KEY);
+
         var instance = playerEditings.get(player.getUniqueId());
         if (instance == null)
             return;
 
-        player.removePotionEffect(PotionEffectType.SLOWNESS);
-        player.removePotionEffect(PotionEffectType.JUMP_BOOST);
-        if (instance.prePotionSlowness != null)
-            player.addPotionEffect(instance.prePotionSlowness);
-        if (instance.prePotionJump != null)
-            player.addPotionEffect(instance.prePotionJump);
-
+        if (instance.canFly)
+            player.setAllowFlight(true);
         playerEditings.remove(player.getUniqueId());
+    }
+
+    public static void stopEditing(Block block) {
+        for (var entry : playerEditings.entrySet())
+            if (entry.getValue().block.getLocation().equals(block.getLocation()))
+                stopEditing(ThisPlugin.instance.getServer().getPlayer(entry.getKey()));
     }
 
     public static boolean isEditing(Player player) {
         return playerEditings.containsKey(player.getUniqueId());
     }
-
-    private static final float SCALE_INCREMENT = 1f / 4f;
 
     public static void handleInputMove(Player player, Input input) {
         var inst = playerEditings.get(player.getUniqueId());
@@ -149,14 +156,14 @@ public class Editor {
                     NamedTextColor.GRAY));
     }
 
-    public record EditorInstance(ItemDisplay head, PotionEffect prePotionSlowness,
-            PotionEffect prePotionJump, EditorMode mode, int shiftDown) {
+    public record EditorInstance(Block block, ItemDisplay head, EditorMode mode, int shiftDown,
+            boolean canFly) {
         public EditorInstance shiftDown(int to) {
-            return new EditorInstance(head(), prePotionSlowness(), prePotionJump(), mode(), to);
+            return new EditorInstance(block(), head(), mode(), to, canFly());
         }
 
         public EditorInstance mode(EditorMode mode) {
-            return new EditorInstance(head(), prePotionSlowness(), prePotionJump(), mode, shiftDown());
+            return new EditorInstance(block(), head(), mode, shiftDown(), canFly());
         }
     }
 
