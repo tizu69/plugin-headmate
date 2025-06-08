@@ -55,8 +55,8 @@ public class Transformers {
         // for wall heads, attach to the wall
         if (blockdata instanceof Directional directional)
             return directional.getFacing().getDirection().toVector3f()
-                    .mul(-0.25f).add(0.5f, 0.75f, 0.5f);
-        return new Vector3f(0.5f, 0.5f, 0.5f);
+                    .mul(-0.25f).add(0.0f, 0.25f, 0.0f);
+        return new Vector3f(00f, 00f, 00f);
     }
 
     public static AxisAngle4f fromEuler(float pitch, float yaw, float roll) {
