@@ -34,7 +34,7 @@ public class Editor {
 
         var instance = new EditorInstance(head, previousSlowness, previousJump, EditorMode.MOVE, -1);
         playerEditings.put(player.getUniqueId(), instance);
-        showHowTo(player, true);
+        showHowTo(player);
     }
 
     public static void stopEditing(Player player) {
@@ -116,7 +116,7 @@ public class Editor {
         if (!input.isSneak() && inst.shiftDown > 0) {
             var newInst = inst.mode(inst.mode.next()).shiftDown(-1);
             playerEditings.put(player.getUniqueId(), newInst);
-            showHowTo(player, true);
+            showHowTo(player);
             return;
         }
         if (!input.isSneak() || inst.shiftDown > 0)
@@ -136,7 +136,7 @@ public class Editor {
         }, 2 * 20);
     }
 
-    public static void showHowTo(Player player, boolean again) {
+    public static void showHowTo(Player player) {
         var instance = playerEditings.get(player.getUniqueId());
         if (instance == null)
             return;
@@ -146,9 +146,6 @@ public class Editor {
         else if (instance.mode == EditorMode.TRANSFORM)
             player.sendActionBar(Component.text("Left/Right to rotate, Forward/Backward to scale",
                     NamedTextColor.GRAY));
-        if (again)
-            player.getServer().getScheduler().runTaskLater(ThisPlugin.instance,
-                    task -> showHowTo(player, false), 40);
     }
 
     public record EditorInstance(ItemDisplay head, PotionEffect prePotionSlowness,
