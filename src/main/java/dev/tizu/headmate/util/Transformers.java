@@ -10,10 +10,11 @@ import org.joml.Vector3f;
 
 public class Transformers {
     public static int getRotIndex(Quaternionf rot) {
-        var yaw = (float) Math.toDegrees(rot.y());
+        var yaw = (float) Math.toDegrees(Math.atan2(2.0f * (rot.w() * rot.y() + rot.x() * rot.z()),
+                1.0f - 2.0f * (rot.y() * rot.y() + rot.z() * rot.z())));
         if (yaw < 0)
             yaw += 360;
-        return (int) Math.round(yaw / 22.5f);
+        return (int) Math.round(yaw / 22.5f) + 8;
     }
 
     public static Quaternionf getRot(int index) {
