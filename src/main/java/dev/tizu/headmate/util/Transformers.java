@@ -5,8 +5,12 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
 import org.bukkit.block.data.Rotatable;
 import org.joml.AxisAngle4f;
-import org.joml.Quaternionf;
 import org.joml.Vector3f;
+
+import dev.tizu.headmate.ThisPlugin;
+
+import org.joml.Quaternionf;
+import org.joml.Vector3d;
 
 public class Transformers {
     public static AxisAngle4f getRot(int index) {
@@ -73,5 +77,17 @@ public class Transformers {
         var result = new AxisAngle4f();
         combined.get(result);
         return result;
+    }
+
+    /**
+     * Grabs the largest component of the vector, either negative or positive, and
+     * returns offset or -offset at its place.
+     */
+    public static Vector3f turnIntoGenericOffset(Vector3d in, float offset) {
+        var out = new Vector3f();
+        var max = in.maxComponent();
+        out.setComponent(max, (float) (offset * Math.signum(in.get(max))));
+        ThisPlugin.instance.getLogger().info(out.toString() + " from " + in.toString());
+        return out;
     }
 }
