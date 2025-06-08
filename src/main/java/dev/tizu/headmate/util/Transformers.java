@@ -86,7 +86,7 @@ public class Transformers {
     public static Vector3f turnIntoGenericOffset(Vector3d in, float offset) {
         var out = new Vector3f();
         var max = in.maxComponent();
-        out.setComponent(max, (float) (offset * Math.signum(in.get(max))));
+        out.setComponent(max, offset * (float) Math.signum(in.get(max)));
         ThisPlugin.instance.getLogger().info(out.toString() + " from " + in.toString());
         return out;
     }
