@@ -36,8 +36,8 @@ public class Editor {
         var instance = new EditorInstance(head, previousSlowness, previousJump, pos, facing);
         playerEditings.put(player.getUniqueId(), instance);
 
-        player.sendActionBar(Component.text("Press ").append(Component.keybind("key.sprint"))
-                .append(Component.text(" to stop editing")));
+        player.sendActionBar(Component.text("Press ").append(Component.keybind("key.sneak"))
+                .append(Component.text(" to Finalize")));
     }
 
     public static void stopEditing(Player player) {
