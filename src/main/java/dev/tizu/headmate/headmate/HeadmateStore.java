@@ -48,7 +48,7 @@ public class HeadmateStore {
         list = new ArrayList<>(list == null ? new ArrayList<>() : list);
 
         var world = block.getWorld();
-        var loc = block.getLocation();
+        var loc = block.getLocation().clone().add(0.5, 0.5, 0.5);
 
         // transfer the player head to the item display
         var item = new ItemStack(Material.PLAYER_HEAD);
@@ -66,7 +66,7 @@ public class HeadmateStore {
     }
 
     public static void add(Block block, ResolvableProfile profile, float yaw) {
-        HeadmateStore.add(block, profile, new Vector3f(0.5f, 0.5f, 0.5f),
+        HeadmateStore.add(block, profile, new Vector3f(0f, 0f, 0f),
                 Transformers.getRot(yaw));
     }
 
