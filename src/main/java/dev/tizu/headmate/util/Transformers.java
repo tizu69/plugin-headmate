@@ -9,6 +9,13 @@ import org.joml.Vector3d;
 import org.joml.Vector3f;
 
 public class Transformers {
+    public static int getRotIndex(Quaternionf rot) {
+        var yaw = (float) Math.toDegrees(rot.y());
+        if (yaw < 0)
+            yaw += 360;
+        return (int) Math.round(yaw / 22.5f);
+    }
+
     public static Quaternionf getRot(int index) {
         return new Quaternionf().rotationY((float) Math.toRadians(((index * 22.5f) % 360) - 180));
     }

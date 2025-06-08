@@ -15,9 +15,7 @@ public class EditorListener implements Listener {
 
         var input = event.getInput();
         Editor.handleInputMove(player, input);
-
-        if (input.isSneak())
-            Editor.stopEditing(player);
+        Editor.handleInputControl(player, input);
     }
 
     @EventHandler

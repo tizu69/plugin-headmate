@@ -10,7 +10,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Transformation;
-import org.joml.Quaternionf;
 import org.joml.Vector3d;
 import org.joml.Vector3f;
 
@@ -33,11 +32,9 @@ public class Editor {
         player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP_BOOST,
                 PotionEffect.INFINITE_DURATION, 127, false, false, false));
 
-        var instance = new EditorInstance(head, previousSlowness, previousJump);
+        var instance = new EditorInstance(head, previousSlowness, previousJump, EditorMode.MOVE, -1);
         playerEditings.put(player.getUniqueId(), instance);
-
-        player.sendActionBar(Component.text("Press ").append(Component.keybind("key.sneak"))
-                .append(Component.text(" to Finalize")));
+        showHowTo(player, true);
     }
 
     public static void stopEditing(Player player) {
@@ -59,38 +56,117 @@ public class Editor {
         return playerEditings.containsKey(player.getUniqueId());
     }
 
+    private static final float SCALE_INCREMENT = 1f / 4f;
+
     public static void handleInputMove(Player player, Input input) {
         var inst = playerEditings.get(player.getUniqueId());
         if (inst == null)
             return;
 
+        var trans = inst.head.getTransformation();
         var movementOffset = new Vector3d();
-        var yaw = Math.toRadians(player.getYaw());
+        var rotation = trans.getLeftRotation();
+        var scale = 0f;
 
-        if (input.isForward())
-            movementOffset.add(-Math.sin(yaw), 0, Math.cos(yaw));
-        if (input.isBackward())
-            movementOffset.add(Math.sin(yaw), 0, -Math.cos(yaw));
-        if (input.isLeft())
-            movementOffset.add(Math.cos(yaw), 0, Math.sin(yaw));
-        if (input.isRight())
-            movementOffset.add(-Math.cos(yaw), 0, -Math.sin(yaw));
-        if (input.isJump())
-            movementOffset.add(0, 0.2, 0);
-        if (input.isSprint())
-            movementOffset.add(0, -0.2, 0);
+        switch (inst.mode) {
+            case MOVE:
+                var yaw = Math.toRadians(player.getYaw());
+                if (input.isForward())
+                    movementOffset.add(-Math.sin(yaw), 0, Math.cos(yaw));
+                if (input.isBackward())
+                    movementOffset.add(Math.sin(yaw), 0, -Math.cos(yaw));
+                if (input.isLeft())
+                    movementOffset.add(Math.cos(yaw), 0, Math.sin(yaw));
+                if (input.isRight())
+                    movementOffset.add(-Math.cos(yaw), 0, -Math.sin(yaw));
+                if (input.isJump())
+                    movementOffset.add(0, 0.2, 0);
+                if (input.isSprint())
+                    movementOffset.add(0, -0.2, 0);
+                break;
+            case TRANSFORM:
+                if (input.isForward())
+                    scale += Editor.SCALE_INCREMENT;
+                if (input.isBackward())
+                    scale -= Editor.SCALE_INCREMENT;
+                if (input.isLeft())
+                    rotation = Transformers.getRot(Transformers.getRotIndex(rotation) - 1);
+                if (input.isRight())
+                    rotation = Transformers.getRot(Transformers.getRotIndex(rotation) + 1);
+                break;
+        }
         player.setFlying(false);
 
-        var trans = inst.head.getTransformation();
+        float previousScale = trans.getScale().x;
+        float newScale = Math.min(Math.max(previousScale + scale, SCALE_INCREMENT), 2.5f);
+        float scaleOffset = (newScale - previousScale) / 2f;
+
         var transPos = trans.getTranslation();
-        transPos.add(Transformers.turnIntoGenericOffset(movementOffset, 0.0625f));
-        transPos.min(new Vector3f(1));
-        transPos.max(new Vector3f(-1));
-        inst.head.setTransformation(new Transformation(transPos, trans.getLeftRotation(),
-                trans.getScale(), trans.getRightRotation()));
+        transPos.add(Transformers.turnIntoGenericOffset(movementOffset, 0.0625f))
+                .add(0, scaleOffset, 0).min(new Vector3f(1)).max(new Vector3f(-1));
+        inst.head.setTransformation(new Transformation(transPos, rotation,
+                new Vector3f(newScale), trans.getRightRotation()));
+    }
+
+    public static void handleInputControl(Player player, Input input) {
+        var inst = playerEditings.get(player.getUniqueId());
+        if (inst == null)
+            return;
+
+        if (!input.isSneak() && inst.shiftDown > 0) {
+            var newInst = inst.mode(inst.mode.next()).shiftDown(-1);
+            playerEditings.put(player.getUniqueId(), newInst);
+            showHowTo(player, true);
+            return;
+        }
+        if (!input.isSneak() || inst.shiftDown > 0)
+            return;
+
+        var sneakTime = player.getTicksLived();
+        playerEditings.put(player.getUniqueId(), inst.shiftDown(sneakTime));
+
+        player.sendActionBar(Component.text("Hold to save, release to change mode", NamedTextColor.YELLOW));
+        player.getServer().getScheduler().runTaskLater(ThisPlugin.instance, task -> {
+            var current = playerEditings.get(player.getUniqueId());
+            if (current == null || current.shiftDown != sneakTime)
+                return;
+
+            Editor.stopEditing(player);
+            player.sendActionBar(Component.text("Saving...", NamedTextColor.GREEN));
+        }, 2 * 20);
+    }
+
+    public static void showHowTo(Player player, boolean again) {
+        var instance = playerEditings.get(player.getUniqueId());
+        if (instance == null)
+            return;
+        if (instance.mode == EditorMode.MOVE)
+            player.sendActionBar(Component.text("Move, Jump, Sprint to move, Sneak to save",
+                    NamedTextColor.GRAY));
+        else if (instance.mode == EditorMode.TRANSFORM)
+            player.sendActionBar(Component.text("Left/Right to rotate, Forward/Backward to scale",
+                    NamedTextColor.GRAY));
+        if (again)
+            player.getServer().getScheduler().runTaskLater(ThisPlugin.instance,
+                    task -> showHowTo(player, false), 40);
     }
 
     public record EditorInstance(ItemDisplay head, PotionEffect prePotionSlowness,
-            PotionEffect prePotionJump) {
+            PotionEffect prePotionJump, EditorMode mode, int shiftDown) {
+        public EditorInstance shiftDown(int to) {
+            return new EditorInstance(head(), prePotionSlowness(), prePotionJump(), mode(), to);
+        }
+
+        public EditorInstance mode(EditorMode mode) {
+            return new EditorInstance(head(), prePotionSlowness(), prePotionJump(), mode, shiftDown());
+        }
+    }
+
+    public enum EditorMode {
+        MOVE, TRANSFORM;
+
+        public EditorMode next() {
+            return values()[(this.ordinal() + 1) % values().length];
+        }
     }
 }
