@@ -1,7 +1,9 @@
 package dev.tizu.headmate.menu;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.GameMode;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -65,6 +67,13 @@ public class MenuList implements Menu {
         } else if (event.isLeftClick()) {
             this.inv.close();
             Editor.startEditing(player, block, headmates[slot]);
+        } else if (event.isRightClick()) {
+            if (player.getGameMode() != GameMode.CREATIVE)
+                return;
+            var entity = headmates[slot];
+            var item = entity.getItemStack();
+            player.getInventory().addItem(item);
+            render();
         }
     }
 
