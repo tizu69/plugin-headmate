@@ -8,8 +8,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 
-import dev.tizu.headmate.ThisPlugin;
-
+import dev.tizu.headmate.editor.Editor;
 import dev.tizu.headmate.menu.MenuList;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import net.kyori.adventure.text.Component;
@@ -41,18 +40,11 @@ public class HeadmateListener implements Listener {
         }
 
         if (!isHeadmate) {
-            HeadmateStore.create(block);
+            var display = HeadmateStore.create(block);
             event.getPlayer().spawnParticle(Particle.ENCHANT, block.getLocation()
                     .add(0.5, 0.5, 0.5), 1000);
             event.setCancelled(true);
-            if (handHeadHasSkin) {
-                player.sendActionBar(Component.text(
-                        "Shift-click with a textured head to add the head you're holding...", NamedTextColor.GRAY));
-                player.getServer().getScheduler().runTaskLater(ThisPlugin.instance, (task) -> {
-                    player.sendActionBar(
-                            Component.text("Shift-click with no-skin head to open menu.", NamedTextColor.GRAY));
-                }, 2 * 20);
-            }
+            Editor.startEditing(player, display);
             return;
         }
 
@@ -61,10 +53,11 @@ public class HeadmateListener implements Listener {
                 player.sendActionBar(Component.text("Too many heads!", NamedTextColor.RED));
                 return;
             }
-            HeadmateStore.add(block, head.getData(DataComponentTypes.PROFILE), player.getYaw());
+            var entity = HeadmateStore.add(block, head.getData(DataComponentTypes.PROFILE), player.getYaw());
             if (player.getGameMode() == GameMode.SURVIVAL)
                 event.getItemInHand().subtract();
             event.setCancelled(true);
+            Editor.startEditing(player, entity);
             return;
         }
 

@@ -30,7 +30,7 @@ public class HeadmateStore {
         return pdc.has(getKey(block), PersistentDataType.LIST.strings());
     }
 
-    public static void create(Block block) {
+    public static ItemDisplay create(Block block) {
         if (block.getType() != Material.PLAYER_HEAD && block.getType() != Material.PLAYER_WALL_HEAD)
             throw new IllegalArgumentException("Invalid block type, got " + block.getType());
 
@@ -38,11 +38,11 @@ public class HeadmateStore {
         var blockdata = skull.getBlockData();
         var profile = skull.getPlayerProfile();
         block.setType(Material.BARRIER);
-        HeadmateStore.add(block, profile != null ? ResolvableProfile.resolvableProfile(profile) : null,
+        return HeadmateStore.add(block, profile != null ? ResolvableProfile.resolvableProfile(profile) : null,
                 Transformers.getPos(blockdata), Transformers.getRot(blockdata));
     }
 
-    public static void add(Block block, ResolvableProfile profile, Vector3f position, Quaternionf rotation) {
+    public static ItemDisplay add(Block block, ResolvableProfile profile, Vector3f position, Quaternionf rotation) {
         var pdc = block.getChunk().getPersistentDataContainer();
 
         var list = pdc.get(getKey(block), PersistentDataType.LIST.strings());
@@ -64,10 +64,11 @@ public class HeadmateStore {
         });
         list.add(entity.getUniqueId().toString());
         pdc.set(getKey(block), PersistentDataType.LIST.strings(), list);
+        return (ItemDisplay) entity;
     }
 
-    public static void add(Block block, ResolvableProfile profile, float yaw) {
-        HeadmateStore.add(block, profile, new Vector3f(0f, 0f, 0f),
+    public static ItemDisplay add(Block block, ResolvableProfile profile, float yaw) {
+        return HeadmateStore.add(block, profile, new Vector3f(0f, 0f, 0f),
                 Transformers.getRot(yaw));
     }
 
