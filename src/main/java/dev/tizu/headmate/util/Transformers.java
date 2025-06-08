@@ -4,20 +4,16 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
 import org.bukkit.block.data.Rotatable;
-import org.joml.AxisAngle4f;
-import org.joml.Vector3f;
-
-import dev.tizu.headmate.ThisPlugin;
-
 import org.joml.Quaternionf;
 import org.joml.Vector3d;
+import org.joml.Vector3f;
 
 public class Transformers {
-    public static AxisAngle4f getRot(int index) {
-        return Transformers.fromEuler(0, ((index * 22.5f) % 360) - 180, 0);
+    public static Quaternionf getRot(int index) {
+        return new Quaternionf().rotationY((float) Math.toRadians(((index * 22.5f) % 360) - 180));
     }
 
-    public static AxisAngle4f getRot(BlockData blockdata) {
+    public static Quaternionf getRot(BlockData blockdata) {
         BlockFace face;
         if (blockdata instanceof Directional directional)
             face = directional.getFacing();
@@ -47,7 +43,7 @@ public class Transformers {
         };
     }
 
-    public static AxisAngle4f getRot(float yaw) {
+    public static Quaternionf getRot(float yaw) {
         // being drunk is fun (i wasnt drunk but feels like it, wtf did i do)
         float normalizedYaw = yaw < 0 ? yaw + 360 : yaw;
         float flippedYaw = (540 - normalizedYaw) % 360;
@@ -63,22 +59,6 @@ public class Transformers {
         return new Vector3f(00f, 00f, 00f);
     }
 
-    public static AxisAngle4f fromEuler(float pitch, float yaw, float roll) {
-        var xRad = (float) Math.toRadians(pitch);
-        var yRad = (float) Math.toRadians(yaw);
-        var zRad = (float) Math.toRadians(roll);
-
-        var qX = new Quaternionf().rotationX(xRad);
-        var qY = new Quaternionf().rotationY(yRad);
-        var qZ = new Quaternionf().rotationZ(zRad);
-        var combined = new Quaternionf();
-        combined.set(qY).mul(qX).mul(qZ);
-
-        var result = new AxisAngle4f();
-        combined.get(result);
-        return result;
-    }
-
     /**
      * Grabs the largest component of the vector, either negative or positive, and
      * returns offset or -offset at its place.
@@ -87,7 +67,6 @@ public class Transformers {
         var out = new Vector3f();
         var max = in.maxComponent();
         out.setComponent(max, offset * (float) Math.signum(in.get(max)));
-        ThisPlugin.instance.getLogger().info(out.toString() + " from " + in.toString());
         return out;
     }
 }

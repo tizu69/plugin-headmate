@@ -14,6 +14,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.Transformation;
 import org.joml.AxisAngle4f;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import dev.tizu.headmate.ThisPlugin;
@@ -41,7 +42,7 @@ public class HeadmateStore {
                 Transformers.getPos(blockdata), Transformers.getRot(blockdata));
     }
 
-    public static void add(Block block, ResolvableProfile profile, Vector3f position, AxisAngle4f rotation) {
+    public static void add(Block block, ResolvableProfile profile, Vector3f position, Quaternionf rotation) {
         var pdc = block.getChunk().getPersistentDataContainer();
 
         var list = pdc.get(getKey(block), PersistentDataType.LIST.strings());
@@ -59,7 +60,7 @@ public class HeadmateStore {
             var id = (ItemDisplay) e;
             id.setItemStack(item);
             id.setTransformation(new Transformation(position, rotation,
-                    new Vector3f(1, 1, 1), new AxisAngle4f(0, 0, 0, 0)));
+                    new Vector3f(1, 1, 1), new Quaternionf()));
         });
         list.add(entity.getUniqueId().toString());
         pdc.set(getKey(block), PersistentDataType.LIST.strings(), list);

@@ -10,12 +10,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Transformation;
-import org.joml.Vector2f;
+import org.joml.Quaternionf;
 import org.joml.Vector3d;
 import org.joml.Vector3f;
 
+import dev.tizu.headmate.ThisPlugin;
 import dev.tizu.headmate.util.Transformers;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 public class Editor {
     private static Map<UUID, EditorInstance> playerEditings = new HashMap<>();
