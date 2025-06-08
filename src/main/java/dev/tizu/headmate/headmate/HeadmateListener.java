@@ -8,6 +8,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 
+import dev.tizu.headmate.ThisPlugin;
+
 import dev.tizu.headmate.menu.MenuList;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import net.kyori.adventure.text.Component;
@@ -26,8 +28,11 @@ public class HeadmateListener implements Listener {
         var isHeadmate = HeadmateStore.has(block);
         var handHeadHasSkin = head.getData(DataComponentTypes.PROFILE) != null;
         if (!isHeadmate && block.getType() != Material.PLAYER_HEAD
-                && block.getType() != Material.PLAYER_WALL_HEAD)
+                && block.getType() != Material.PLAYER_WALL_HEAD) {
+            player.sendActionBar(Component.text(
+                    "Shift-click with a player skull to start merging heads!", NamedTextColor.GRAY));
             return;
+        }
 
         if (!player.isSneaking()) {
             player.sendActionBar(Component.text(
@@ -40,9 +45,14 @@ public class HeadmateListener implements Listener {
             event.getPlayer().spawnParticle(Particle.ENCHANT, block.getLocation()
                     .add(0.5, 0.5, 0.5), 1000);
             event.setCancelled(true);
-            if (handHeadHasSkin)
+            if (handHeadHasSkin) {
                 player.sendActionBar(Component.text(
-                        "Shift-click again to add the head you're holding!", NamedTextColor.GRAY));
+                        "Shift-click with a textured head to add the head you're holding...", NamedTextColor.GRAY));
+                player.getServer().getScheduler().runTaskLater(ThisPlugin.instance, (task) -> {
+                    player.sendActionBar(
+                            Component.text("Shift-click with no-skin head to open menu.", NamedTextColor.GRAY));
+                }, 2 * 20);
+            }
             return;
         }
 

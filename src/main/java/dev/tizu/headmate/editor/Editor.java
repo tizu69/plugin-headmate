@@ -126,7 +126,7 @@ public class Editor {
         playerEditings.put(player.getUniqueId(), inst.shiftDown(sneakTime));
 
         player.sendActionBar(Component.text("Hold to save, release to change mode", NamedTextColor.YELLOW));
-        player.getServer().getScheduler().runTaskLater(ThisPlugin.instance, task -> {
+        player.getServer().getScheduler().runTaskLater(ThisPlugin.instance, (task) -> {
             var current = playerEditings.get(player.getUniqueId());
             if (current == null || current.shiftDown != sneakTime)
                 return;
