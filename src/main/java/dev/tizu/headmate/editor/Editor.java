@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import org.bukkit.Input;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -13,6 +14,9 @@ import org.joml.Vector2f;
 import org.joml.Vector3d;
 import org.joml.Vector3f;
 
+import dev.tizu.headmate.util.Transformers;
+import net.kyori.adventure.text.Component;
+
 public class Editor {
     private static Map<UUID, EditorInstance> playerEditings = new HashMap<>();
 
@@ -21,13 +25,19 @@ public class Editor {
             stopEditing(player);
 
         var previousSlowness = player.getPotionEffect(PotionEffectType.SLOWNESS);
-        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, PotionEffect.INFINITE_DURATION,
-                5, false, false, false));
+        var previousJump = player.getPotionEffect(PotionEffectType.JUMP_BOOST);
+        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS,
+                PotionEffect.INFINITE_DURATION, 6, false, false, false));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP_BOOST,
+                PotionEffect.INFINITE_DURATION, 127, false, false, false));
 
         var pos = player.getLocation().toVector().toVector3d();
         var facing = new Vector2f(player.getYaw(), player.getPitch());
-        var instance = new EditorInstance(head, previousSlowness, pos, facing);
+        var instance = new EditorInstance(head, previousSlowness, previousJump, pos, facing);
         playerEditings.put(player.getUniqueId(), instance);
+
+        player.sendActionBar(Component.text("Press ").append(Component.keybind("key.sprint"))
+                .append(Component.text(" to stop editing")));
     }
 
     public static void stopEditing(Player player) {
@@ -36,8 +46,11 @@ public class Editor {
             return;
 
         player.removePotionEffect(PotionEffectType.SLOWNESS);
-        if (instance.prePotion != null)
-            player.addPotionEffect(instance.prePotion);
+        player.removePotionEffect(PotionEffectType.JUMP_BOOST);
+        if (instance.prePotionSlowness != null)
+            player.addPotionEffect(instance.prePotionSlowness);
+        if (instance.prePotionJump != null)
+            player.addPotionEffect(instance.prePotionJump);
 
         playerEditings.remove(player.getUniqueId());
     }
@@ -62,7 +75,7 @@ public class Editor {
                 trans.getLeftRotation(), trans.getScale(), trans.getRightRotation()));
     }
 
-    public record EditorInstance(ItemDisplay head, PotionEffect prePotion,
-            Vector3d pos, Vector2f rot) {
+    public record EditorInstance(ItemDisplay head, PotionEffect prePotionSlowness,
+            PotionEffect prePotionJump, Vector3d pos, Vector2f rot) {
     }
 }
