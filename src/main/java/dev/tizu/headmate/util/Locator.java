@@ -10,7 +10,7 @@ public class Locator {
     public static Vector3d centerOfHead(ItemDisplay head) {
         var trans = head.getTransformation();
         var offset = trans.getTranslation();
-        offset.sub(0, trans.getScale().x / 4, 0);
+        offset.sub(0, trans.getScale().y / 4, 0);
         return head.getLocation().toVector().toVector3d().add(offset);
     }
 

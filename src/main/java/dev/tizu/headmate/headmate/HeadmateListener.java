@@ -12,7 +12,6 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
-import dev.tizu.headmate.ThisPlugin;
 import dev.tizu.headmate.editor.Editor;
 import dev.tizu.headmate.menu.MenuList;
 import dev.tizu.headmate.util.Locator;
