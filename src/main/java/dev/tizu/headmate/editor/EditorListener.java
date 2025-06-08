@@ -13,7 +13,7 @@ public class EditorListener implements Listener {
             return;
 
         var input = event.getInput();
-        Editor.autoMove(player);
+        Editor.handleInputMove(player, input);
 
         if (input.isSneak())
             Editor.stopEditing(player);

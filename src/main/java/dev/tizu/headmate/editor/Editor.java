@@ -31,9 +31,7 @@ public class Editor {
         player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP_BOOST,
                 PotionEffect.INFINITE_DURATION, 127, false, false, false));
 
-        var pos = player.getLocation().toVector().toVector3d();
-        var facing = new Vector2f(player.getYaw(), player.getPitch());
-        var instance = new EditorInstance(head, previousSlowness, previousJump, pos, facing);
+        var instance = new EditorInstance(head, previousSlowness, previousJump);
         playerEditings.put(player.getUniqueId(), instance);
 
         player.sendActionBar(Component.text("Press ").append(Component.keybind("key.sneak"))
@@ -59,23 +57,39 @@ public class Editor {
         return playerEditings.containsKey(player.getUniqueId());
     }
 
-    public static void autoMove(Player player) {
+    public static void handleInputMove(Player player, Input input) {
         var inst = playerEditings.get(player.getUniqueId());
         if (inst == null)
             return;
 
-        var loc = player.getLocation().clone();
-        loc.set(inst.pos.x, inst.pos.y, inst.pos.z);
-        if (loc.equals(player.getLocation()))
-            return;
-        player.teleport(loc);
+        var movementOffset = new Vector3d();
+        var yaw = Math.toRadians(player.getYaw());
+
+        if (input.isForward())
+            movementOffset.add(-Math.sin(yaw), 0, Math.cos(yaw));
+        if (input.isBackward())
+            movementOffset.add(Math.sin(yaw), 0, -Math.cos(yaw));
+        if (input.isLeft())
+            movementOffset.add(Math.cos(yaw), 0, Math.sin(yaw));
+        if (input.isRight())
+            movementOffset.add(-Math.cos(yaw), 0, -Math.sin(yaw));
+        if (input.isJump())
+            movementOffset.add(0, 0.2, 0);
+        if (input.isSprint())
+            movementOffset.add(0, -0.2, 0);
+        player.setFlying(false);
 
         var trans = inst.head.getTransformation();
-        inst.head.setTransformation(new Transformation(new Vector3f(),
-                trans.getLeftRotation(), trans.getScale(), trans.getRightRotation()));
+        var transPos = trans.getTranslation();
+        transPos.add(Transformers.turnIntoGenericOffset(movementOffset, 0.0625f));
+        transPos.min(new Vector3f(1));
+        transPos.max(new Vector3f(-1));
+        player.sendActionBar(Component.text(transPos.toString() + " /// " + yaw));
+        inst.head.setTransformation(new Transformation(transPos, trans.getLeftRotation(),
+                trans.getScale(), trans.getRightRotation()));
     }
 
     public record EditorInstance(ItemDisplay head, PotionEffect prePotionSlowness,
-            PotionEffect prePotionJump, Vector3d pos, Vector2f rot) {
+            PotionEffect prePotionJump) {
     }
 }
