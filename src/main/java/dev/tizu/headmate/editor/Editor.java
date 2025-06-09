@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Input;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
@@ -101,6 +102,24 @@ public class Editor {
                     rotation = Transformers.getRot(Transformers.getRotIndex(rotation) - 1);
                 if (input.isRight())
                     rotation = Transformers.getRot(Transformers.getRotIndex(rotation) + 1);
+                if (input.isSprint())
+                    // change hitbox. block -> drop, void -> barrier, barrier -> void
+                    switch (inst.block.getType()) {
+                        case STRUCTURE_VOID:
+                            inst.block.setType(Material.BARRIER);
+                            player.sendActionBar(Component.text("-> Solid block", NamedTextColor.RED));
+                            break;
+                        case BARRIER:
+                            inst.block.setType(Material.STRUCTURE_VOID);
+                            player.sendActionBar(Component.text("-> Pass-through", NamedTextColor.RED));
+                            break;
+                        default:
+                            inst.block.breakNaturally();
+                            inst.block.setType(Material.STRUCTURE_VOID);
+                            player.sendActionBar(Component.text("-> Pass-through (dropped)",
+                                    NamedTextColor.RED));
+                            break;
+                    }
                 break;
         }
         player.setFlying(false);
@@ -154,7 +173,7 @@ public class Editor {
             player.sendActionBar(Component.text("Move, Jump, Sprint to move, Sneak to save",
                     NamedTextColor.GRAY));
         else if (instance.mode == EditorMode.TRANSFORM)
-            player.sendActionBar(Component.text("Left/Right to rotate, Forward/Backward to scale",
+            player.sendActionBar(Component.text("Left/Right to rotate, Forward/Backward to scale, Sprint to hitbox",
                     NamedTextColor.GRAY));
     }
 
