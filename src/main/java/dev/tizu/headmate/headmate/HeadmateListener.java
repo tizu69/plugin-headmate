@@ -1,5 +1,6 @@
 package dev.tizu.headmate.headmate;
 
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -8,6 +9,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 
+import dev.tizu.headmate.ThisPlugin;
 import dev.tizu.headmate.editor.Editor;
 import dev.tizu.headmate.menu.MenuList;
 import io.papermc.paper.datacomponent.DataComponentTypes;
@@ -73,9 +75,10 @@ public class HeadmateListener implements Listener {
             return;
 
         if (!player.isSneaking()) {
+            Bukkit.getScheduler().runTaskLaterAsynchronously(ThisPlugin.instance,
+                    () -> event.getBlock().setType(Material.STRUCTURE_VOID), 1);
             player.sendActionBar(Component.text(
                     "Hold shift to remove merged heads!", NamedTextColor.RED));
-            event.setCancelled(true);
             return;
         }
 

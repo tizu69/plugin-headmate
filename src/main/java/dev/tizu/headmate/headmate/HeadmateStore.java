@@ -26,8 +26,6 @@ public class HeadmateStore {
     public static final int PROPOSED_MAX_HEADS = 27;
 
     public static boolean has(Block block) {
-        if (block.getType() != Material.BARRIER)
-            return false;
         var pdc = block.getChunk().getPersistentDataContainer();
         return pdc.has(getKey(block), PersistentDataType.LIST.strings());
     }
@@ -39,7 +37,7 @@ public class HeadmateStore {
         var skull = (Skull) block.getState();
         var blockdata = skull.getBlockData();
         var profile = skull.getPlayerProfile();
-        block.setType(Material.BARRIER);
+        block.setType(Material.STRUCTURE_VOID);
         return HeadmateStore.add(block, profile != null ? ResolvableProfile.resolvableProfile(profile) : null,
                 Transformers.getPos(blockdata), Transformers.getRot(blockdata));
     }
