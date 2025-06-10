@@ -1,17 +1,20 @@
 package dev.tizu.headmate.wand;
 
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
-import org.bukkit.block.Skull;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 
+import dev.tizu.headmate.ThisPlugin;
 import dev.tizu.headmate.editor.Editor;
 import dev.tizu.headmate.headmate.HeadmateStore;
 import dev.tizu.headmate.menu.MenuList;
@@ -27,6 +30,11 @@ public class WandListener implements Listener {
         var player = event.getPlayer();
         if (player.getInventory().getItemInMainHand().getType() != Material.BREEZE_ROD
                 || event.getAction() == Action.PHYSICAL)
+            return;
+
+        // HACK: this would otherwise get calld twice, once for off and once for the
+        // main hand. oops!
+        if (event.getHand() != EquipmentSlot.HAND)
             return;
 
         event.setCancelled(true);
