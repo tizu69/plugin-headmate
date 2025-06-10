@@ -14,32 +14,39 @@ public class Locator {
         return head.getLocation().toVector().toVector3d().add(offset);
     }
 
-    public static ItemDisplay lookingAt(Location player, List<ItemDisplay> considerations) {
-        var playerLoc = player.toVector().toVector3d();
-        var direction = player.getDirection().toVector3d().normalize();
+    public static float diameterOfHead(ItemDisplay head) {
+        var trans = head.getTransformation();
+        return trans.getScale().y / 2f;
+    }
 
-        double maxDistance = 10.0;
-        ItemDisplay bestHead = null;
+    public static ItemDisplay lookingAt(Location player, List<ItemDisplay> considerations) {
+        var ppos = player.toVector().toVector3d();
+        var pdir = player.getDirection().toVector3d().normalize();
+
+        ItemDisplay target = null;
         var closestDistance = Double.MAX_VALUE;
 
         for (var head : considerations) {
-            var headLoc = centerOfHead(head);
-            var toHead = headLoc.sub(playerLoc, new Vector3d());
+            var hpos = centerOfHead(head);
+            var hrad = diameterOfHead(head) / Math.sqrt(Math.PI);
+            var oc = ppos.sub(hpos, new Vector3d());
 
-            var projection = toHead.dot(direction);
-            if (projection < 0 || projection > maxDistance)
+            var b = 2.0 * oc.dot(pdir);
+            var c = oc.dot(oc) - hrad * hrad;
+            var discriminant = b * b - 4 * c;
+            if (discriminant < 0)
                 continue;
 
-            var closestPoint = direction.mul(projection, new Vector3d()).add(playerLoc);
-            var distanceSquared = headLoc.distanceSquared(closestPoint);
-
-            if (distanceSquared < 0.5 * 0.5 && projection < closestDistance) {
-                closestDistance = projection;
-                bestHead = head;
+            var t1 = (-b - Math.sqrt(discriminant)) / 2;
+            var t2 = (-b + Math.sqrt(discriminant)) / 2;
+            var t = Math.max(Math.min(t1, t2), 0);
+            if (t > 0 && t < closestDistance) {
+                closestDistance = t;
+                target = head;
             }
         }
 
-        return bestHead;
+        return target;
     }
 
 }
