@@ -4,7 +4,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInputEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 
 public class EditorListener implements Listener {
 
@@ -20,7 +20,7 @@ public class EditorListener implements Listener {
     }
 
     @EventHandler
-    public void onPlayerQuit(PlayerQuitEvent event) {
+    public void onPlayerJoin(PlayerJoinEvent event) {
         var player = event.getPlayer();
         if (!Editor.isEditing(player))
             return;
