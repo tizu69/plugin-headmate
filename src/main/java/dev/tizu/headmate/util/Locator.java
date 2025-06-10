@@ -31,14 +31,16 @@ public class Locator {
             var hrad = diameterOfHead(head) / Math.sqrt(Math.PI);
             var oc = ppos.sub(hpos, new Vector3d());
 
+            var a = 1.0;
             var b = 2.0 * oc.dot(pdir);
             var c = oc.dot(oc) - hrad * hrad;
-            var discriminant = b * b - 4 * c;
+            var discriminant = b * b - 4 * a * c;
             if (discriminant < 0)
                 continue;
 
-            var t1 = (-b - Math.sqrt(discriminant)) / 2;
-            var t2 = (-b + Math.sqrt(discriminant)) / 2;
+            var sqrtDiscriminant = Math.sqrt(discriminant);
+            var t1 = (-b - sqrtDiscriminant) / (2 * a);
+            var t2 = (-b + sqrtDiscriminant) / (2 * a);
             var t = Math.max(Math.min(t1, t2), 0);
             if (t > 0 && t < closestDistance) {
                 closestDistance = t;
