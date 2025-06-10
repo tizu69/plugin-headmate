@@ -25,9 +25,10 @@ public class WandListener implements Listener {
 
         event.setCancelled(true);
 
+        var block = event.getClickedBlock();
         switch (event.getAction()) {
             case RIGHT_CLICK_BLOCK:
-                if (player.isSneaking() && HeadmateStore.has(event.getClickedBlock())) {
+                if (player.isSneaking() && HeadmateStore.has(block)) {
                     handleListClick(event);
                     return;
                 }
@@ -44,7 +45,12 @@ public class WandListener implements Listener {
                 break;
 
             case LEFT_CLICK_BLOCK:
-                HeadmateStore.changeHitbox(player, event.getClickedBlock());
+                if (!HeadmateStore.has(block)) {
+                    player.sendActionBar(Component.text("Cannot change hitbox here", NamedTextColor.RED));
+                    return;
+                }
+                HeadmateStore.changeHitbox(player, block);
+                break;
         }
     }
 
