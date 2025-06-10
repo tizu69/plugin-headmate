@@ -112,6 +112,21 @@ public class WandListener implements Listener {
         }
     }
 
+    @EventHandler
+    public void onBlockBreak(BlockBreakEvent event) {
+        var player = event.getPlayer();
+        var block = event.getBlock();
+
+        if (player.getInventory().getItemInMainHand().getType() == Material.BREEZE_ROD)
+            return;
+        if (!HeadmateStore.has(block))
+            return;
+        Bukkit.getScheduler().runTaskLater(ThisPlugin.instance,
+                () -> event.getBlock().setType(Material.STRUCTURE_VOID), 1);
+        player.sendActionBar(Component.text(
+                "Use the wand to delete these heads!", NamedTextColor.RED));
+    }
+
     private void handleListClick(PlayerInteractEvent event) {
         var player = event.getPlayer();
         var block = event.getClickedBlock();
