@@ -42,6 +42,9 @@ public class WandListener implements Listener {
                 }
                 handleRayClick(event);
                 break;
+
+            case LEFT_CLICK_BLOCK:
+                HeadmateStore.changeHitbox(player, event.getClickedBlock());
         }
     }
 

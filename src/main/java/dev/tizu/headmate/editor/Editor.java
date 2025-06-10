@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Input;
-import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
@@ -17,6 +16,7 @@ import org.joml.Vector3d;
 import org.joml.Vector3f;
 
 import dev.tizu.headmate.ThisPlugin;
+import dev.tizu.headmate.headmate.HeadmateStore;
 import dev.tizu.headmate.util.Transformers;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -103,23 +103,7 @@ public class Editor {
                 if (input.isRight())
                     rotation = Transformers.getRot(Transformers.getRotIndex(rotation) + 1);
                 if (input.isSprint())
-                    // change hitbox. block -> drop & void, void -> barrier, barrier -> void
-                    switch (inst.block.getType()) {
-                        case STRUCTURE_VOID:
-                            inst.block.setType(Material.BARRIER);
-                            player.sendActionBar(Component.text("-> Solid block", NamedTextColor.RED));
-                            break;
-                        case BARRIER:
-                            inst.block.setType(Material.STRUCTURE_VOID);
-                            player.sendActionBar(Component.text("-> Pass-through", NamedTextColor.RED));
-                            break;
-                        default:
-                            inst.block.breakNaturally();
-                            inst.block.setType(Material.STRUCTURE_VOID);
-                            player.sendActionBar(Component.text("-> Pass-through (dropped)",
-                                    NamedTextColor.RED));
-                            break;
-                    }
+                    HeadmateStore.changeHitbox(player, inst.block);
                 break;
         }
         player.setFlying(false);
