@@ -123,6 +123,8 @@ public class HeadmateStore {
     public static ItemDisplay[] getHeads(Block block) {
         var pdc = block.getChunk().getPersistentDataContainer();
         var list = pdc.get(getKey(block), PersistentDataType.LIST.strings());
+        if (list == null)
+            return new ItemDisplay[0];
         var heads = new ItemDisplay[list.size()];
         for (int i = 0; i < heads.length; i++) {
             var uuid = UUID.fromString(list.get(i));

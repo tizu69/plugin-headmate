@@ -1,13 +1,10 @@
 package dev.tizu.headmate.editor;
 
-import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInputEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-
-import dev.tizu.headmate.ThisPlugin;
 
 public class EditorListener implements Listener {
 
