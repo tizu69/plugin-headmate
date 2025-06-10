@@ -1,6 +1,8 @@
 package dev.tizu.headmate.wand;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -75,6 +77,11 @@ public class WandListener implements Listener {
 
         var block = head.getWorld().getBlockAt(head.getLocation());
         Editor.startEditing(player, block, head);
+
+        var center = Locator.centerOfHead(head);
+        var count = (int) Math.max(Locator.diameterOfHead(head) * 50, 5);
+        player.spawnParticle(Particle.EFFECT, new Location(head.getWorld(), center.x, center.y,
+                center.z), count, 0.0, 0.0, 0.0, 5);
     }
 
 }
