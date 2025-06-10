@@ -1,9 +1,12 @@
 package dev.tizu.headmate.wand;
 
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.block.Skull;
 import org.bukkit.entity.ItemDisplay;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -13,6 +16,7 @@ import dev.tizu.headmate.editor.Editor;
 import dev.tizu.headmate.headmate.HeadmateStore;
 import dev.tizu.headmate.menu.MenuList;
 import dev.tizu.headmate.util.Locator;
+import io.papermc.paper.datacomponent.DataComponentTypes;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
@@ -28,31 +32,75 @@ public class WandListener implements Listener {
         event.setCancelled(true);
 
         var block = event.getClickedBlock();
+        var offhand = player.getInventory().getItemInOffHand();
         switch (event.getAction()) {
             case RIGHT_CLICK_BLOCK:
-                if (player.isSneaking() && HeadmateStore.has(block)) {
-                    handleListClick(event);
-                    return;
+                switch (offhand.getType()) {
+                    case PLAYER_HEAD:
+                        handleCreation(event);
+                        return;
+                    case AIR:
+                        if (player.isSneaking() && HeadmateStore.has(block)) {
+                            handleListClick(event);
+                            return;
+                        }
+                        break;
+                    default:
+                        player.sendActionBar(Component.text("That's not a head!", NamedTextColor.RED));
+                        return;
                 }
             case RIGHT_CLICK_AIR:
-                if (player.isSneaking()) {
-                    // the above falls through - if you're not looking at a block & sneaking OR
-                    // the block you're looking at has no merged heads, this fires! very neat.
-                    player.sendActionBar(Component.text(
-                            "No merged heads here, click with head in offhand to create one!",
-                            NamedTextColor.RED));
-                    return;
+                switch (offhand.getType()) {
+                    case PLAYER_HEAD:
+                        player.sendActionBar(
+                                Component.text("Face a block to create a merged head", NamedTextColor.RED));
+                        return;
+                    case AIR:
+                        if (player.isSneaking()) {
+                            // the above falls through - if you're not looking at a block & sneaking OR
+                            // the block you're looking at has no merged heads, this fires! very neat.
+                            player.sendActionBar(Component.text(
+                                    "No merged heads here, click with head in offhand to create one!",
+                                    NamedTextColor.RED));
+                            return;
+                        }
+                        handleRayClick(event);
+                        break;
+                    default:
+                        player.sendActionBar(
+                                Component.text("Hold head or nothing in offhand", NamedTextColor.RED));
+                        return;
                 }
-                handleRayClick(event);
                 break;
 
             case LEFT_CLICK_BLOCK:
-                if (!HeadmateStore.has(block)) {
-                    player.sendActionBar(Component.text("Cannot change hitbox here", NamedTextColor.RED));
-                    return;
+                switch (offhand.getType()) {
+                    case LAVA_BUCKET:
+                        if (!HeadmateStore.has(block)) {
+                            player.sendActionBar(Component.text("Nothing to remove!", NamedTextColor.RED));
+                            return;
+                        }
+                        HeadmateStore.removeAll(block);
+                        return;
+                    case AIR:
+                        if (!HeadmateStore.has(block)) {
+                            player.sendActionBar(Component.text("Cannot change hitbox here", NamedTextColor.RED));
+                            return;
+                        }
+                        if (!player.isSneaking()) {
+                            HeadmateStore.changeHitbox(player, block);
+                            break;
+                        }
+                    default:
+                        player.sendActionBar(Component.text(
+                                "Hold lava (to delete) or nothing (change hitbox) in offhand",
+                                NamedTextColor.RED));
+                        return;
                 }
-                HeadmateStore.changeHitbox(player, block);
                 break;
+
+            default:
+                return;
         }
     }
 
@@ -77,7 +125,30 @@ public class WandListener implements Listener {
 
         var block = head.getWorld().getBlockAt(head.getLocation());
         Editor.startEditing(player, block, head);
+        spawnParticle(head, player);
+    }
 
+    private void handleCreation(PlayerInteractEvent event) {
+        var player = event.getPlayer();
+        var block = player.isSneaking() ? event.getClickedBlock()
+                : event.getClickedBlock().getRelative(event.getBlockFace());
+
+        if (HeadmateStore.getCount(block) >= HeadmateStore.PROPOSED_MAX_HEADS) {
+            player.sendActionBar(Component.text("Too many heads!", NamedTextColor.RED));
+            return;
+        }
+
+        if (block.getType() == Material.AIR)
+            block.setType(Material.STRUCTURE_VOID);
+        var profile = player.getInventory().getItemInOffHand().getData(DataComponentTypes.PROFILE);
+        var entity = HeadmateStore.add(block, profile, player.getYaw());
+        if (player.getGameMode() == GameMode.SURVIVAL)
+            player.getInventory().getItemInOffHand().subtract();
+        Editor.startEditing(player, block, entity);
+        return;
+    }
+
+    private void spawnParticle(ItemDisplay head, Player player) {
         var center = Locator.centerOfHead(head);
         var count = (int) Math.max(Locator.diameterOfHead(head) * 50, 5);
         player.spawnParticle(Particle.EFFECT, new Location(head.getWorld(), center.x, center.y,

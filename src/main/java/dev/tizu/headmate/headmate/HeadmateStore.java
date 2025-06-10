@@ -116,8 +116,8 @@ public class HeadmateStore {
             }
         }
         pdc.remove(getKey(block));
-        // TODO: drop the heads
-        block.setType(Material.AIR);
+        if (block.getType() == Material.STRUCTURE_VOID)
+            block.setType(Material.AIR);
     }
 
     public static ItemDisplay[] getHeads(Block block) {
