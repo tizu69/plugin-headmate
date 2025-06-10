@@ -103,7 +103,7 @@ public class Editor {
                 if (input.isRight())
                     rotation = Transformers.getRot(Transformers.getRotIndex(rotation) + 1);
                 if (input.isSprint())
-                    // change hitbox. block -> drop, void -> barrier, barrier -> void
+                    // change hitbox. block -> drop & void, void -> barrier, barrier -> void
                     switch (inst.block.getType()) {
                         case STRUCTURE_VOID:
                             inst.block.setType(Material.BARRIER);

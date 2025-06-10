@@ -75,7 +75,7 @@ public class HeadmateListener implements Listener {
             return;
 
         if (!player.isSneaking()) {
-            Bukkit.getScheduler().runTaskLaterAsynchronously(ThisPlugin.instance,
+            Bukkit.getScheduler().runTaskLater(ThisPlugin.instance,
                     () -> event.getBlock().setType(Material.STRUCTURE_VOID), 1);
             player.sendActionBar(Component.text(
                     "Hold shift to remove merged heads!", NamedTextColor.RED));
