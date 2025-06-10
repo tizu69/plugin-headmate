@@ -1,10 +1,13 @@
 package dev.tizu.headmate.editor;
 
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInputEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+
+import dev.tizu.headmate.ThisPlugin;
 
 public class EditorListener implements Listener {
 
@@ -21,10 +24,7 @@ public class EditorListener implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
-        var player = event.getPlayer();
-        if (!Editor.isEditing(player))
-            return;
-        Editor.stopEditing(player);
+        Editor.stopEditing(event.getPlayer());
     }
 
     @EventHandler
