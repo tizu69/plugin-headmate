@@ -10,6 +10,7 @@ import org.bukkit.block.Skull;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemDisplay;
+import org.bukkit.entity.Player;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
@@ -21,13 +22,13 @@ import dev.tizu.headmate.ThisPlugin;
 import dev.tizu.headmate.util.Transformers;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.ResolvableProfile;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 public class HeadmateStore {
     public static final int PROPOSED_MAX_HEADS = 27;
 
     public static boolean has(Block block) {
-        if (block.getType() != Material.BARRIER)
-            return false;
         var pdc = block.getChunk().getPersistentDataContainer();
         return pdc.has(getKey(block), PersistentDataType.LIST.strings());
     }
@@ -39,7 +40,7 @@ public class HeadmateStore {
         var skull = (Skull) block.getState();
         var blockdata = skull.getBlockData();
         var profile = skull.getPlayerProfile();
-        block.setType(Material.BARRIER);
+        block.setType(Material.STRUCTURE_VOID);
         return HeadmateStore.add(block, profile != null ? ResolvableProfile.resolvableProfile(profile) : null,
                 Transformers.getPos(blockdata), Transformers.getRot(blockdata));
     }
@@ -115,13 +116,15 @@ public class HeadmateStore {
             }
         }
         pdc.remove(getKey(block));
-        // TODO: drop the heads
-        block.setType(Material.AIR);
+        if (block.getType() == Material.STRUCTURE_VOID)
+            block.setType(Material.AIR);
     }
 
     public static ItemDisplay[] getHeads(Block block) {
         var pdc = block.getChunk().getPersistentDataContainer();
         var list = pdc.get(getKey(block), PersistentDataType.LIST.strings());
+        if (list == null)
+            return new ItemDisplay[0];
         var heads = new ItemDisplay[list.size()];
         for (int i = 0; i < heads.length; i++) {
             var uuid = UUID.fromString(list.get(i));
@@ -134,6 +137,28 @@ public class HeadmateStore {
         var pdc = block.getChunk().getPersistentDataContainer();
         var list = pdc.get(getKey(block), PersistentDataType.LIST.strings());
         return list == null ? 0 : list.size();
+    }
+
+    public static void changeHitbox(Player player, Block block) {
+        if (!HeadmateStore.has(block))
+            return;
+        // change hitbox. block -> drop & void, void -> barrier, barrier -> void
+        switch (block.getType()) {
+            case STRUCTURE_VOID:
+                block.setType(Material.BARRIER);
+                player.sendActionBar(Component.text("-> Solid block", NamedTextColor.RED));
+                break;
+            case BARRIER:
+                block.setType(Material.STRUCTURE_VOID);
+                player.sendActionBar(Component.text("-> Pass-through", NamedTextColor.RED));
+                break;
+            default:
+                block.breakNaturally();
+                block.setType(Material.STRUCTURE_VOID);
+                player.sendActionBar(Component.text("-> Pass-through (dropped)",
+                        NamedTextColor.RED));
+                break;
+        }
     }
 
     private static NamespacedKey getKey(Block block) {

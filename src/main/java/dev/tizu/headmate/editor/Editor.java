@@ -25,6 +25,7 @@ public class Editor {
 
     private static final NamespacedKey EDITING_KEY = new NamespacedKey(ThisPlugin.instance, "editing");
     private static final float SCALE_INCREMENT = 1f / 4f;
+    private static final float TRANSFORM_MAX = 1f;
 
     public static void startEditing(Player player, Block block, ItemDisplay head) {
         stopEditing(player);
@@ -110,7 +111,8 @@ public class Editor {
 
         var transPos = trans.getTranslation();
         transPos.add(Transformers.turnIntoGenericOffset(movementOffset, 0.0625f))
-                .add(0, scaleOffset, 0).min(new Vector3f(1)).max(new Vector3f(-1));
+                .add(0, scaleOffset, 0).min(new Vector3f(TRANSFORM_MAX)).max(new Vector3f(-TRANSFORM_MAX));
+
         inst.head.setTransformation(new Transformation(transPos, rotation,
                 new Vector3f(newScale), trans.getRightRotation()));
     }
@@ -152,7 +154,7 @@ public class Editor {
             player.sendActionBar(Component.text("Move, Jump, Sprint to move, Sneak to save",
                     NamedTextColor.GRAY));
         else if (instance.mode == EditorMode.TRANSFORM)
-            player.sendActionBar(Component.text("Left/Right to rotate, Forward/Backward to scale",
+            player.sendActionBar(Component.text("Left/Right to rotate, Forward/Backward to scale, Sprint to hitbox",
                     NamedTextColor.GRAY));
     }
 
