@@ -116,7 +116,7 @@ public class HeadmateStore {
             }
         }
         pdc.remove(getKey(block));
-        if (block.getType() == Material.STRUCTURE_VOID)
+        if (block.getType() == Material.STRUCTURE_VOID || block.getType() == Material.BARRIER)
             block.setType(Material.AIR);
     }
 
