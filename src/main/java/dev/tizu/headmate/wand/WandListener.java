@@ -32,12 +32,11 @@ public class WandListener implements Listener {
                 || event.getAction() == Action.PHYSICAL)
             return;
 
+        event.setCancelled(true);
         // HACK: this would otherwise get calld twice, once for off and once for the
         // main hand. oops!
         if (event.getHand() != EquipmentSlot.HAND)
             return;
-
-        event.setCancelled(true);
 
         var block = event.getClickedBlock();
         var offhand = player.getInventory().getItemInOffHand();
