@@ -121,6 +121,7 @@ public class WandListener implements Listener {
             return;
         if (!HeadmateStore.has(block))
             return;
+
         Bukkit.getScheduler().runTaskLater(ThisPlugin.instance,
                 () -> event.getBlock().setType(Material.STRUCTURE_VOID), 1);
         player.sendActionBar(Component.text(
