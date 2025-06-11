@@ -7,6 +7,7 @@ plugin. **This requires another plugin (or method) to obtain skinned player
 heads to work properly.**
 
 ![A villager house with a monitor, three rubiks cubes and a pillowed seat](./marketing/showcase.png)
+![A house with a kitchen consisting of a sink, stove, and utensils](./marketing/showcase2.png)
 
 ## Controls
 
