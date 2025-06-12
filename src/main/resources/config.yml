@@ -1,0 +1,4 @@
+anchorDistanceLimit: 1
+maxSideLength: 1.5
+minSideLength: 0.125
+maxHeads: 27

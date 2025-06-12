@@ -20,6 +20,7 @@ import dev.tizu.headmate.ThisPlugin;
 import dev.tizu.headmate.editor.Editor;
 import dev.tizu.headmate.headmate.HeadmateStore;
 import dev.tizu.headmate.menu.MenuList;
+import dev.tizu.headmate.util.Config;
 import dev.tizu.headmate.util.Locator;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import net.kyori.adventure.text.Component;
@@ -172,7 +173,7 @@ public class WandListener implements Listener {
         var block = player.isSneaking() ? event.getClickedBlock()
                 : event.getClickedBlock().getRelative(event.getBlockFace());
 
-        if (HeadmateStore.getCount(block) >= HeadmateStore.PROPOSED_MAX_HEADS) {
+        if (HeadmateStore.getCount(block) >= Config.maxHeads()) {
             player.sendActionBar(Component.text("Too many heads!", NamedTextColor.RED));
             return;
         }

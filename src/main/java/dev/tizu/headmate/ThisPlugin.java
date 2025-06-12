@@ -5,6 +5,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import dev.tizu.headmate.editor.EditorListener;
 import dev.tizu.headmate.menu.Menu;
+import dev.tizu.headmate.util.Config;
 import dev.tizu.headmate.wand.WandListener;
 
 public class ThisPlugin extends JavaPlugin {
@@ -12,7 +13,11 @@ public class ThisPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        saveResource("config.yml", /* replace */ false);
+        saveDefaultConfig();
+
         instance = this;
+        Config.loadConfig();
         Bukkit.getPluginManager().registerEvents(new EditorListener(), this);
         Bukkit.getPluginManager().registerEvents(new Menu.MenuListener(), this);
         Bukkit.getPluginManager().registerEvents(new WandListener(), this);

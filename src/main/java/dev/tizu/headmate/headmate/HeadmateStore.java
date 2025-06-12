@@ -26,8 +26,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
 public class HeadmateStore {
-    public static final int PROPOSED_MAX_HEADS = 27;
-
     public static boolean has(Block block) {
         var pdc = block.getChunk().getPersistentDataContainer();
         return pdc.has(getKey(block), PersistentDataType.LIST.strings());
