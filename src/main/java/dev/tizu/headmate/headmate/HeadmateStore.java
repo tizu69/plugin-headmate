@@ -120,6 +120,30 @@ public class HeadmateStore {
             block.setType(Material.AIR);
     }
 
+    public static void removeInvalid(Block block) {
+        var pdc = block.getChunk().getPersistentDataContainer();
+        var list = pdc.get(getKey(block), PersistentDataType.LIST.strings());
+        if (list == null)
+            return;
+
+        for (int i = 0; i < list.size(); i++) {
+            var uuid = UUID.fromString(list.get(i));
+            var entity = block.getWorld().getEntity(uuid);
+            if (entity == null) {
+                list.remove(i);
+                i--;
+            }
+        }
+
+        pdc.set(getKey(block), PersistentDataType.LIST.strings(), list);
+        if (list.isEmpty()) {
+            // yes, this will retry removing all heads, but worth it for only one cleanup
+            // task
+            removeAll(block);
+            return;
+        }
+    }
+
     public static ItemDisplay[] getHeads(Block block) {
         var pdc = block.getChunk().getPersistentDataContainer();
         var list = pdc.get(getKey(block), PersistentDataType.LIST.strings());
@@ -128,7 +152,12 @@ public class HeadmateStore {
         var heads = new ItemDisplay[list.size()];
         for (int i = 0; i < heads.length; i++) {
             var uuid = UUID.fromString(list.get(i));
-            heads[i] = (ItemDisplay) block.getWorld().getEntity(uuid);
+            var entity = block.getWorld().getEntity(uuid);
+            if (entity == null) {
+                heads[i] = null;
+                continue;
+            }
+            heads[i] = (ItemDisplay) entity;
         }
         return heads;
     }
