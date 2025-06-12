@@ -35,6 +35,9 @@ public class WandListener implements Listener {
             return;
 
         event.setCancelled(true);
+        if (!player.hasPermission("headmate.wand.use"))
+            return;
+
         // HACK: this would otherwise get calld twice, once for off and once for the
         // main hand. oops!
         if (event.getHand() != EquipmentSlot.HAND)
@@ -135,8 +138,9 @@ public class WandListener implements Listener {
 
         Bukkit.getScheduler().runTaskLater(ThisPlugin.instance,
                 () -> event.getBlock().setType(Material.STRUCTURE_VOID), 1);
-        player.sendActionBar(Component.text(
-                "Use the wand to delete these heads!", NamedTextColor.RED));
+        player.sendActionBar(Component.text(player.hasPermission("headmate.wand.use")
+                ? "Use the wand to delete these heads!"
+                : "You cannot delete these heads!", NamedTextColor.RED));
     }
 
     private void handleListClick(PlayerInteractEvent event) {

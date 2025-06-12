@@ -5,3 +5,8 @@ description: Place heads the way you mate
 author: tizu.dev
 website: https://tizu.dev
 api-version: "1.21.5"
+
+permissions:
+  headmate.wand.use:
+    description: "Use the Headmate wand"
+    default: "not op"
