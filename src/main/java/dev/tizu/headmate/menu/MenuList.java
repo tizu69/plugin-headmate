@@ -2,11 +2,14 @@ package dev.tizu.headmate.menu;
 
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 import dev.tizu.headmate.ThisPlugin;
 import dev.tizu.headmate.editor.Editor;
@@ -37,6 +40,16 @@ public class MenuList implements Menu {
         this.inv.clear();
         var headmates = HeadmateStore.getHeads(block);
         for (int i = 0; i < headmates.length; i++) {
+            if (headmates[i] == null) {
+                var stack = ItemStack.of(Material.SKELETON_SKULL);
+                stack.setData(DataComponentTypes.CUSTOM_NAME, Component.text("Externally deleted head",
+                        NamedTextColor.RED));
+                stack.setData(DataComponentTypes.LORE, ItemLore.lore(List.of(
+                        Component.text("Shift-right-click to remove", NamedTextColor.RED))));
+                this.inv.setItem(i, stack);
+                continue;
+            }
+
             var stack = headmates[i].getItemStack();
             stack.setData(DataComponentTypes.LORE, ItemLore.lore(List.of(
                     Component.text("Click to edit", NamedTextColor.BLUE),
@@ -57,14 +70,23 @@ public class MenuList implements Menu {
         if (slot >= headmates.length)
             return;
 
+        if (headmates[slot] == null) {
+            if (event.isShiftClick() && event.isRightClick()) {
+                HeadmateStore.removeInvalid(block);
+                this.close();
+            }
+            return;
+        }
+
         var uuid = headmates[slot].getUniqueId();
         if (event.isShiftClick() && event.isRightClick()) {
             HeadmateStore.remove(block, uuid);
             if (headmates.length == 1)
-                this.inv.close();
-            render();
+                this.close();
+            else
+                render();
         } else if (event.isLeftClick()) {
-            this.inv.close();
+            this.close();
             Editor.startEditing(player, block, headmates[slot]);
         } else if (event.isRightClick()) {
             if (player.getGameMode() != GameMode.CREATIVE)
@@ -74,6 +96,13 @@ public class MenuList implements Menu {
             player.getInventory().addItem(item);
             render();
         }
+    }
+
+    private void close() {
+        Bukkit.getScheduler().runTaskLater(ThisPlugin.instance, (task) -> {
+            if (this.inv != null)
+                this.inv.close();
+        }, 1);
     }
 
 }

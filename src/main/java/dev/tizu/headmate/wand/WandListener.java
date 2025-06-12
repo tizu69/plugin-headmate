@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
@@ -13,6 +14,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.persistence.PersistentDataType;
 
 import dev.tizu.headmate.ThisPlugin;
 import dev.tizu.headmate.editor.Editor;
@@ -37,6 +39,16 @@ public class WandListener implements Listener {
         // main hand. oops!
         if (event.getHand() != EquipmentSlot.HAND)
             return;
+
+        var rateLimitKey = new NamespacedKey(ThisPlugin.instance, "last-wand-click");
+        var pdc = player.getPersistentDataContainer();
+        if (pdc.has(rateLimitKey, PersistentDataType.LONG)) {
+            var lastClick = pdc.get(rateLimitKey, PersistentDataType.LONG);
+            var deltaClick = System.currentTimeMillis() - lastClick;
+            if (deltaClick < 250 && deltaClick > 0)
+                return;
+        }
+        pdc.set(rateLimitKey, PersistentDataType.LONG, System.currentTimeMillis());
 
         var block = event.getClickedBlock();
         var offhand = player.getInventory().getItemInOffHand();
