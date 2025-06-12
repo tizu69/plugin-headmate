@@ -16,6 +16,7 @@ import org.joml.Vector3d;
 import org.joml.Vector3f;
 
 import dev.tizu.headmate.ThisPlugin;
+import dev.tizu.headmate.util.Config;
 import dev.tizu.headmate.util.Transformers;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -25,7 +26,6 @@ public class Editor {
 
     private static final NamespacedKey EDITING_KEY = new NamespacedKey(ThisPlugin.instance, "editing");
     private static final float SCALE_INCREMENT = 1f / 4f;
-    private static final float TRANSFORM_MAX = 1f;
 
     public static void startEditing(Player player, Block block, ItemDisplay head) {
         stopEditing(player);
@@ -106,12 +106,13 @@ public class Editor {
         player.setFlying(false);
 
         float previousScale = trans.getScale().x;
-        float newScale = Math.min(Math.max(previousScale + scale, SCALE_INCREMENT), 2.5f);
+        float newScale = Math.min(Math.max(previousScale + scale, Config.minSideLength()), Config.maxSideLength());
         float scaleOffset = (newScale - previousScale) / 2f;
 
         var transPos = trans.getTranslation();
         transPos.add(Transformers.turnIntoGenericOffset(movementOffset, 0.0625f))
-                .add(0, scaleOffset, 0).min(new Vector3f(TRANSFORM_MAX)).max(new Vector3f(-TRANSFORM_MAX));
+                .add(0, scaleOffset, 0).min(new Vector3f(Config.anchorDistanceLimit()))
+                .max(new Vector3f(-Config.anchorDistanceLimit()));
 
         inst.head.setTransformation(new Transformation(transPos, rotation,
                 new Vector3f(newScale), trans.getRightRotation()));

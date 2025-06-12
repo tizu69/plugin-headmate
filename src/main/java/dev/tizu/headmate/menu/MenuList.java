@@ -14,6 +14,7 @@ import org.bukkit.inventory.ItemStack;
 import dev.tizu.headmate.ThisPlugin;
 import dev.tizu.headmate.editor.Editor;
 import dev.tizu.headmate.headmate.HeadmateStore;
+import dev.tizu.headmate.util.Config;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.ItemLore;
 import net.kyori.adventure.text.Component;
@@ -26,7 +27,7 @@ public class MenuList implements Menu {
 
     public MenuList(Block block) {
         this.inv = ThisPlugin.instance.getServer().createInventory(this,
-                Math.round(HeadmateStore.PROPOSED_MAX_HEADS / 9) * 9, Component.text("Merged Heads"));
+                (int) Math.ceil(Config.maxHeads() / 9f) * 9, Component.text("Merged Heads"));
         this.block = block;
         render();
     }
