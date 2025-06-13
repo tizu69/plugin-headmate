@@ -1,4 +1,6 @@
 anchorDistanceLimit: 1
 maxSideLength: 1.5
 minSideLength: 0.125
+movementStepSize: 0.0625
+scaleStepSize: 0.125
 maxHeads: 27
