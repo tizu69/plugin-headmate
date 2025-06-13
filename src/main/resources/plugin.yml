@@ -10,3 +10,6 @@ permissions:
   headmate.wand.use:
     description: "Use the Headmate wand"
     default: true
+  headmate.wand.reload.use:
+    description: "Use the Headmate wand with lava, left-clicking into air to reload config"
+    default: op

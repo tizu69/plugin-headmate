@@ -121,6 +121,12 @@ public class WandListener implements Listener {
                         return;
                 }
                 break;
+            case LEFT_CLICK_AIR:
+                if (offhand.getType() != Material.LAVA_BUCKET || !player.hasPermission("headmate.wand.reload.use"))
+                    return;
+                ThisPlugin.instance.reloadConfig();
+                player.sendActionBar(Component.text("Config reloaded!", NamedTextColor.GREEN));
+                break;
 
             default:
                 return;
