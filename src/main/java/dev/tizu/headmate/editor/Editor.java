@@ -25,7 +25,6 @@ public class Editor {
     private static Map<UUID, EditorInstance> playerEditings = new HashMap<>();
 
     private static final NamespacedKey EDITING_KEY = new NamespacedKey(ThisPlugin.instance, "editing");
-    private static final float SCALE_INCREMENT = 1f / 4f;
 
     public static void startEditing(Player player, Block block, ItemDisplay head) {
         stopEditing(player);
@@ -94,9 +93,9 @@ public class Editor {
                 break;
             case TRANSFORM:
                 if (input.isForward())
-                    scale += Editor.SCALE_INCREMENT;
+                    scale += Config.scaleStepSize() * 2f;
                 if (input.isBackward())
-                    scale -= Editor.SCALE_INCREMENT;
+                    scale -= Config.scaleStepSize() * 2f;
                 if (input.isLeft())
                     rotation = Transformers.getRot(Transformers.getRotIndex(rotation) - 1);
                 if (input.isRight())
@@ -106,11 +105,12 @@ public class Editor {
         player.setFlying(false);
 
         float previousScale = trans.getScale().x;
-        float newScale = Math.min(Math.max(previousScale + scale, Config.minSideLength()), Config.maxSideLength());
+        float newScale = Math.min(Math.max(previousScale + scale, Config.minSideLength() * 2f),
+                Config.maxSideLength() * 2f);
         float scaleOffset = (newScale - previousScale) / 2f;
 
         var transPos = trans.getTranslation();
-        transPos.add(Transformers.turnIntoGenericOffset(movementOffset, 0.0625f))
+        transPos.add(Transformers.turnIntoGenericOffset(movementOffset, Config.movementStepSize()))
                 .add(0, scaleOffset, 0).min(new Vector3f(Config.anchorDistanceLimit()))
                 .max(new Vector3f(-Config.anchorDistanceLimit()));
 
