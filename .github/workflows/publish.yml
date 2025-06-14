@@ -35,6 +35,8 @@ jobs:
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: v${{ env.VERSION }}
           name: v${{ env.VERSION }}
@@ -61,7 +63,8 @@ jobs:
           changelog_file: changelog.md
           game_versions: '["1.21.5"]'
           loaders: '["paper","purpur"]'
-      - uses: benwoo1110/hangar-upload-action@v1
+      - name: Publish to Hangar
+        uses: benwoo1110/hangar-upload-action@v1
         with:
           api_token: ${{ secrets.HANGAR_TOKEN }}
           slug: "headmate"
