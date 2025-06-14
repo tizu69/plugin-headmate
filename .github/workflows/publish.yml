@@ -61,9 +61,9 @@ jobs:
           token: ${{ secrets.MODRINTH_TOKEN }}
           project_id: AhwqWlyK
           file_path: build/libs/headmate.jar
-          version_name: headmate ${{ env.VERSION }}
-          version_number: ${{ env.VERSION }}
-          changelog_file: changelog.md
+          name: headmate ${{ env.VERSION }}
+          version: ${{ env.VERSION }}
+          changelog: file:changelog.md
           game_versions: '["1.21.5"]'
           loaders: '["paper","purpur"]'
       - name: Publish to Hangar
