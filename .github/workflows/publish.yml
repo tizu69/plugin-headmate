@@ -29,7 +29,7 @@ jobs:
           sed -i "s/^version: <dev>/version: ${VERSION}/" src/main/resources/plugin.yml
       - name: Generate changelog
         run: |
-          echo "**Full Changelog: https://github.com/tizu69/headmate/compare/v${PREV_VERSION}...v${VERSION}" > changelog.md
+          echo "**Full Changelog**: https://github.com/tizu69/headmate/compare/v${PREV_VERSION}...v${VERSION}" > changelog.md
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -51,7 +51,7 @@ jobs:
           token: ${{ secrets.CURSEFORGE_API_TOKEN }}
           project_id: 1286566
           game_endpoint: bukkit
-          game_versions: "Minecraft 1.21:1.21.5"
+          game_versions: "12988"
           file_path: build/libs/headmate.jar
           changelog: file:changelog.md
           release_type: release
