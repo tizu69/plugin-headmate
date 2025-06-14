@@ -64,7 +64,7 @@ jobs:
           name: headmate ${{ env.VERSION }}
           version: ${{ env.VERSION }}
           changelog: file:changelog.md
-          game_versions: '["1.21.5"]'
+          game_versions: 1.21.5
           loaders: paper,purpur
           featured: true
           release_type: release
