@@ -6,6 +6,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - run: git fetch --prune --unshallow
 
       - name: Set up JDK
         uses: actions/setup-java@v4
@@ -14,8 +15,7 @@ jobs:
           distribution: "temurin"
           architecture: x64
 
-      - name: Get git variables
-        id: vars
+      - name: Obtain version variables
         run: |
           echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
           echo "PREV_VERSION=$(git describe --tags --abbrev=0 | cut -c2-)" >> $GITHUB_ENV
