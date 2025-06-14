@@ -73,7 +73,7 @@ jobs:
         with:
           api_token: ${{ secrets.HANGAR_TOKEN }}
           slug: "headmate"
-          version: ${{ github.event.release.tag_name }}
+          version: ${{ env.VERSION }}
           channel: release
           files: |
             [{ "path": "build/libs/headmate.jar", "platforms": ["PAPER"] }]
