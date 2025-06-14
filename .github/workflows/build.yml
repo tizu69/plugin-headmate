@@ -1,20 +1,33 @@
 on:
   - push
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
           java-version: "21"
           distribution: "temurin"
           architecture: x64
+
+      - name: Get git variables
+        id: vars
+        run: |
+          echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          echo "PREV_VERSION=${$(git describe --tags --abbrev=0):1}" >> $GITHUB_ENV
+      - name: Replace version in plugin.yml
+        run: |
+          sed -i "s/^version: <dev>/version: ${PREV_VERSION}-${SHORT_SHA}/" src/main/resources/plugin.yml
+
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Build with Gradle
         run: ./gradlew jar
+
       - name: Upload jar
         uses: actions/upload-artifact@v4
         with:
