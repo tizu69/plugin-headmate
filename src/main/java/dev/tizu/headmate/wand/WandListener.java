@@ -63,11 +63,16 @@ public class WandListener implements Listener {
                         handleCreation(event);
                         return;
                     case AIR:
-                        if (player.isSneaking() && HeadmateStore.has(block)) {
+                        if (!player.isSneaking())
+                            break;
+                        if (HeadmateStore.has(block))
                             handleListClick(event);
-                            return;
-                        }
-                        break;
+                        else if (block.getType() == Material.PLAYER_HEAD
+                                || block.getType() == Material.PLAYER_WALL_HEAD)
+                            HeadmateStore.create(block);
+                        else
+                            break;
+                        return;
                     default:
                         player.sendActionBar(Component.text("That's not a head!", NamedTextColor.RED));
                         return;
