@@ -29,7 +29,10 @@ jobs:
           sed -i "s/^version: <dev>/version: ${VERSION}/" src/main/resources/plugin.yml
       - name: Generate changelog
         run: |
-          echo "**Full Changelog**: https://github.com/tizu69/headmate/compare/v${PREV_VERSION}...v${VERSION}" > changelog.md
+          echo "**Changes Since v${PREV_VERSION}**\n" > changelog.md
+          git log --pretty=format:"- %s" v${PREV_VERSION}..v${VERSION} >> changelog.md
+          echo "\n\nView commits: https://github.com/tizu69/plugin-headmate/compare/v${PREV_VERSION}...v${VERSION}" >> changelog.md
+          echo "CHANGELOG=$(cat changelog.md)" >> $GITHUB_ENV
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -53,7 +56,7 @@ jobs:
           game_endpoint: bukkit
           game_versions: "12988"
           file_path: build/libs/headmate.jar
-          changelog: file:changelog.md
+          changelog: ${{ env.CHANGELOG }}
           release_type: release
       - name: Publish to Modrinth
         uses: RubixDev/modrinth-upload@v1
@@ -63,7 +66,7 @@ jobs:
           file_path: build/libs/headmate.jar
           name: headmate ${{ env.VERSION }}
           version: ${{ env.VERSION }}
-          changelog: file:changelog.md
+          changelog: ${{ env.CHANGELOG }}
           game_versions: 1.21.5
           loaders: paper,purpur
           featured: true

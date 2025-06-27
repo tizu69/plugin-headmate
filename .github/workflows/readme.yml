@@ -1,0 +1,26 @@
+on:
+  workflow_dispatch:
+
+jobs:
+  readme:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Get README.md (excluding <!-- git-only -->)
+        run: |
+          echo "README=$(sed '/<!-- git-only -->/,/<!-- \/git-only -->/d' README.md)" >> $GITHUB_ENV
+
+      - name: Update on platforms
+        run: |
+          curl -H "Authorization: ${TOKEN}" -H "Content-Type: application/json" \
+            -X PATCH -d "{\"body\": \"${README}\"}" https://api.modrinth.com/v2/project/${PRJID}
+        env:
+          TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+          PRJID: AhwqWlyK
+      - name: Update Hangar
+        run: |
+          curl -H "Authorization: ${TOKEN}" -H "Content-Type: application/json" \
+            -X POST -d "{\"content\": \"${README}\"}" https://hangar.papermc.io/api/internal/pages/save/${PRJID}
+        env:
+          TOKEN: ${{ secrets.HANGAR_TOKEN }}
+          PRJID: 4383/4677

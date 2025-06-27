@@ -6,8 +6,12 @@ Resize, rotate and customize Minecraft heads more than ever before! A PaperMC
 plugin. **This requires another plugin (or method) to obtain skinned player
 heads to work properly.**
 
+<!-- git-only -->
+
 ![A villager house with a monitor, three rubiks cubes and a pillowed seat](./marketing/showcase.png)
 ![A house with a kitchen consisting of a sink, stove, and utensils](./marketing/showcase2.png)
+
+<!-- /git-only -->
 
 ## Controls
 
