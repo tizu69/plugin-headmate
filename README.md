@@ -41,3 +41,7 @@ in the block by Left-clicking with the wand and a Lava Bucket.
 To change the hitbox of the head block, press Left Click while holding the wand.
 This will toggle between a pass-through and a solid block. You can also add a
 custom block by simply placing it while in pass-through mode.
+
+## Current Issues
+
+- No proper WorldEdit/FAWE support yet
