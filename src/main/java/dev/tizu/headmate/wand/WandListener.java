@@ -165,7 +165,8 @@ public class WandListener implements Listener {
         var player = event.getPlayer();
 
         var considerations = player.getNearbyEntities(10, 10, 10).stream()
-                .filter(e -> e instanceof ItemDisplay).map(e -> (ItemDisplay) e).toList();
+                .filter(e -> e instanceof ItemDisplay && HeadmateStore.has((ItemDisplay) e))
+                .map(e -> (ItemDisplay) e).toList();
 
         var head = Locator.lookingAt(player.getEyeLocation(), considerations);
         if (head == null) {
