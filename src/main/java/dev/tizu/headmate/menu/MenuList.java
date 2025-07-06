@@ -39,9 +39,6 @@ public class MenuList implements Menu {
         this.inv.clear();
         var headmates = HeadmateStore.getHeads(block);
         for (int i = 0; i < headmates.length; i++) {
-            // TODO: can this even happen now?
-            if (headmates[i] == null)
-                continue;
             var stack = headmates[i].getItemStack();
             stack.setData(DataComponentTypes.LORE, ItemLore.lore(List.of(
                     Component.text("Click to edit", NamedTextColor.BLUE),

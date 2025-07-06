@@ -10,7 +10,7 @@ import org.joml.Vector3f;
 
 public class Transformers {
     public static float getRot(int index) {
-        return (float) Math.toRadians(((index * 22.5f) % 360));
+        return (float) Math.toRadians(index * 22.5f);
     }
 
     public static int getRot(BlockData blockdata) {
