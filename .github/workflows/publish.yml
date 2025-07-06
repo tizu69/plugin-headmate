@@ -29,9 +29,9 @@ jobs:
           sed -i "s/^version: <dev>/version: ${VERSION}/" src/main/resources/plugin.yml
       - name: Generate changelog
         run: |
-          echo "**Changes** since v${PREV_VERSION}\n" > changelog.md
+          echo -e "**Changes** since v${PREV_VERSION}\n" > changelog.md
           git log --no-merges --pretty=format:"- %s" v${PREV_VERSION}..v${VERSION} | grep "\[change\]" | sed "s/\s*\[[^]]*\]//g" | tac >> changelog.md
-          echo "\nView on GitHub: https://github.com/tizu69/plugin-headmate/compare/v${PREV_VERSION}...v${VERSION}" >> changelog.md
+          echo -e "\nView on GitHub: https://github.com/tizu69/plugin-headmate/compare/v${PREV_VERSION}...v${VERSION}" >> changelog.md
           echo "CHANGELOG<<EOF" >> "$GITHUB_ENV"
           cat changelog.md >> "$GITHUB_ENV"
           echo "EOF" >> "$GITHUB_ENV"
