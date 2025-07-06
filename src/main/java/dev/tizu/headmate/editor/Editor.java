@@ -144,7 +144,7 @@ public class Editor {
             Editor.stopEditing(player);
             player.sendActionBar(Component.text("Saving... To edit again, shift-click with steve head.",
                     NamedTextColor.GREEN));
-        }, 2 * 20);
+        }, 20);
     }
 
     public static void showHowTo(Player player) {
