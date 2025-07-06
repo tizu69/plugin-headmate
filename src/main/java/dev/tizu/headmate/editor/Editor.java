@@ -155,7 +155,7 @@ public class Editor {
             player.sendActionBar(Component.text("Move, Jump, Sprint to move, Sneak to save",
                     NamedTextColor.GRAY));
         else if (instance.mode == EditorMode.TRANSFORM)
-            player.sendActionBar(Component.text("Left/Right to rotate, Forward/Backward to scale, Sprint to hitbox",
+            player.sendActionBar(Component.text("Move to rotate, Jump/Sprint to scale",
                     NamedTextColor.GRAY));
     }
 
