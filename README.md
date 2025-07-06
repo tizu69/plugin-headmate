@@ -6,12 +6,8 @@ Resize, rotate and customize Minecraft heads more than ever before! A PaperMC
 plugin. **This requires another plugin (or method) to obtain skinned player
 heads to work properly.**
 
-<!-- git-only -->
-
 ![A villager house with a monitor, three rubiks cubes and a pillowed seat](./marketing/showcase.png)
 ![A house with a kitchen consisting of a sink, stove, and utensils](./marketing/showcase2.png)
-
-<!-- /git-only -->
 
 ## Controls
 
@@ -42,6 +38,6 @@ To change the hitbox of the head block, press Left Click while holding the wand.
 This will toggle between a pass-through and a solid block. You can also add a
 custom block by simply placing it while in pass-through mode.
 
-## Current Issues
+## To-do
 
-- No proper WorldEdit/FAWE support yet
+- scaling should be relative to the face the head is positioned against

@@ -59,6 +59,10 @@ public class WandListener implements Listener {
         switch (event.getAction()) {
             case RIGHT_CLICK_BLOCK:
                 switch (offhand.getType()) {
+                    case PAPER:
+                        for (var head : HeadmateStore.getHeads(block))
+                            player.sendMessage(HeadmateStore.get(head).toString());
+                        return;
                     case PLAYER_HEAD:
                         handleCreation(event);
                         return;
@@ -165,7 +169,8 @@ public class WandListener implements Listener {
         var player = event.getPlayer();
 
         var considerations = player.getNearbyEntities(10, 10, 10).stream()
-                .filter(e -> e instanceof ItemDisplay).map(e -> (ItemDisplay) e).toList();
+                .filter(e -> e instanceof ItemDisplay de && HeadmateStore.has(de))
+                .map(e -> (ItemDisplay) e).toList();
 
         var head = Locator.lookingAt(player.getEyeLocation(), considerations);
         if (head == null) {

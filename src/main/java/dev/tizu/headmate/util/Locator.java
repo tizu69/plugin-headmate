@@ -6,17 +6,19 @@ import org.bukkit.Location;
 import org.bukkit.entity.ItemDisplay;
 import org.joml.Vector3d;
 
+import dev.tizu.headmate.headmate.HeadmateStore;
+
 public class Locator {
     public static Vector3d centerOfHead(ItemDisplay head) {
-        var trans = head.getTransformation();
-        var offset = trans.getTranslation();
-        offset.sub(0, trans.getScale().y / 4, 0);
-        return head.getLocation().toVector().toVector3d().add(offset);
+        var inst = HeadmateStore.get(head);
+        return head.getLocation().toVector().toVector3d()
+                .add(0.5f, 0.5f, 0.5f)
+                .add(inst.offsetX, inst.offsetY, inst.offsetZ);
     }
 
     public static float diameterOfHead(ItemDisplay head) {
-        var trans = head.getTransformation();
-        return trans.getScale().y / 2f;
+        var inst = HeadmateStore.get(head);
+        return inst.scale;
     }
 
     public static ItemDisplay lookingAt(Location player, List<ItemDisplay> considerations) {
