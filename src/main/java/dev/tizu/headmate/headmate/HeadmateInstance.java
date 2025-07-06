@@ -11,23 +11,15 @@ public class HeadmateInstance {
     public float offsetX = 0;
     public float offsetY = 0;
     public float offsetZ = 0;
-    public float scale = 1;
+    /**
+     * A head is only half the size of the actual entity, so this scale is divided
+     * by 2
+     */
+    public float scale = 0.5f;
     public int rotH = 0;
     public int rotV = 0;
 
     protected HeadmateInstance() {
-    }
-
-    /**
-     * This should only be used for importing old data, V-rotation is not supported!
-     */
-    public HeadmateInstance(Vector3f pos, Quaternionf rot, float scale) {
-        this.offsetX = pos.x;
-        this.offsetY = pos.y;
-        this.offsetZ = pos.z;
-        this.scale = scale;
-        this.rotH = Transformers.getRotIndex(rot);
-        this.rotV = 0;
     }
 
     public HeadmateInstance(float offsetX, float offsetY, float offsetZ, float scale, int rotH, int rotV) {
@@ -40,12 +32,16 @@ public class HeadmateInstance {
     }
 
     public Transformation getTransformation() {
+        var yaw = Transformers.getRot(rotH);
+        var pitch = Transformers.getRot(rotV);
+        float x = (float) (Math.sin(yaw) * Math.sin(pitch) * (scale / 2f));
+        float y = (float) (Math.cos(pitch) * (scale / 2f));
+        float z = (float) (Math.cos(yaw) * Math.sin(pitch) * (scale / 2f));
+
         return new Transformation(
-                new Vector3f(offsetX, offsetY, offsetZ),
-                new Quaternionf()
-                        .rotateY(Transformers.getRotation(rotH))
-                        .rotateX(Transformers.getRotation(rotV)),
-                new Vector3f(scale, scale, scale),
+                new Vector3f(offsetX + 0.5f + x, offsetY + 0.5f + y, offsetZ + 0.5f + z),
+                new Quaternionf().rotateY(yaw).rotateX(pitch),
+                new Vector3f(scale * 2, scale * 2, scale * 2),
                 new Quaternionf());
     }
 
@@ -64,16 +60,33 @@ public class HeadmateInstance {
 
     public HeadmateInstance move(float x, float y, float z) {
         var max = Config.anchorDistanceLimit();
-        this.offsetX = Math.min(Math.max(this.offsetX + x, -max), max);
-        this.offsetY = Math.min(Math.max(this.offsetY + y, -max), max);
-        this.offsetZ = Math.min(Math.max(this.offsetZ + z, -max), max);
+        this.offsetX = Math.clamp(this.offsetX + x, -max, max);
+        this.offsetY = Math.clamp(this.offsetY + y, -max, max);
+        this.offsetZ = Math.clamp(this.offsetZ + z, -max, max);
         return this;
     }
 
-    /** If xyz is positive, add one step, if negative, subtract one step */
-    public HeadmateInstance move(int x, int y, int z) {
+    /**
+     * If xyz is positive, add one step, if negative, subtract one step.
+     * 
+     * @param largestOnly If true, only move the largest component.
+     */
+    public HeadmateInstance move(float x, float y, float z, boolean largestOnly) {
         var one = Config.movementStepSize();
-        return this.move(x * one, y * one, z * one);
+
+        if (!largestOnly)
+            return this.move(Math.signum(x) * one, Math.signum(y) * one, Math.signum(z) * one);
+
+        var absX = Math.abs(x);
+        var absY = Math.abs(y);
+        var absZ = Math.abs(z);
+
+        if (absX >= absY && absX >= absZ)
+            return this.move(Math.signum(x) * one, 0, 0);
+        else if (absY >= absX && absY >= absZ)
+            return this.move(0, Math.signum(y) * one, 0);
+        else
+            return this.move(0, 0, Math.signum(z) * one);
     }
 
     public HeadmateInstance rotateSet(int h, int v) {
@@ -99,7 +112,7 @@ public class HeadmateInstance {
     }
 
     public HeadmateInstance scale(float by) {
-        this.scale += by;
+        this.scale = Math.clamp(this.scale + by, Config.minSideLength(), Config.maxSideLength());
         return this;
     }
 
@@ -109,5 +122,10 @@ public class HeadmateInstance {
 
     public HeadmateInstance scaleUp() {
         return this.scale(Config.scaleStepSize());
+    }
+
+    public String toString() {
+        return "Head{ oX=" + this.offsetX + ", oY=" + this.offsetY + ", oZ=" + this.offsetZ +
+                ", scale=" + this.scale + ", rotH=" + this.rotH + ", rotV=" + this.rotV + " }";
     }
 }

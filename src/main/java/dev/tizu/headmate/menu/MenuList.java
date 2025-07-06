@@ -4,12 +4,10 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 
 import dev.tizu.headmate.ThisPlugin;
 import dev.tizu.headmate.editor.Editor;
@@ -41,16 +39,9 @@ public class MenuList implements Menu {
         this.inv.clear();
         var headmates = HeadmateStore.getHeads(block);
         for (int i = 0; i < headmates.length; i++) {
-            if (headmates[i] == null) {
-                var stack = ItemStack.of(Material.SKELETON_SKULL);
-                stack.setData(DataComponentTypes.CUSTOM_NAME, Component.text("Externally deleted head",
-                        NamedTextColor.RED));
-                stack.setData(DataComponentTypes.LORE, ItemLore.lore(List.of(
-                        Component.text("Shift-right-click to remove", NamedTextColor.RED))));
-                this.inv.setItem(i, stack);
+            // TODO: can this even happen now?
+            if (headmates[i] == null)
                 continue;
-            }
-
             var stack = headmates[i].getItemStack();
             stack.setData(DataComponentTypes.LORE, ItemLore.lore(List.of(
                     Component.text("Click to edit", NamedTextColor.BLUE),
@@ -70,14 +61,8 @@ public class MenuList implements Menu {
             return;
         if (slot >= headmates.length)
             return;
-
-        if (headmates[slot] == null) {
-            if (event.isShiftClick() && event.isRightClick()) {
-                HeadmateStore.removeInvalid(block);
-                this.close();
-            }
+        if (headmates[slot] == null)
             return;
-        }
 
         var uuid = headmates[slot].getUniqueId();
         if (event.isShiftClick() && event.isRightClick()) {

@@ -9,62 +9,56 @@ import org.joml.Vector3d;
 import org.joml.Vector3f;
 
 public class Transformers {
-    public static int getRotIndex(Quaternionf rot) {
-        var yaw = (float) Math.toDegrees(Math.atan2(2.0f * (rot.w() * rot.y() + rot.x() * rot.z()),
-                1.0f - 2.0f * (rot.y() * rot.y() + rot.z() * rot.z())));
-        if (yaw < 0)
-            yaw += 360;
-        return (int) Math.round(yaw / 22.5f) + 8;
+    public static float getRot(int index) {
+        return (float) Math.toRadians(((index * 22.5f) % 360));
     }
 
-    public static Quaternionf getRot(int index) {
-        return new Quaternionf().rotationY((float) Math.toRadians(((index * 22.5f) % 360) - 180));
-    }
-
-    public static Quaternionf getRot(BlockData blockdata) {
+    public static int getRot(BlockData blockdata) {
         BlockFace face;
         if (blockdata instanceof Directional directional)
             face = directional.getFacing();
         else if (blockdata instanceof Rotatable rotatable)
             face = rotatable.getRotation().getOppositeFace();
         else
-            return getRot(0);
+            return 0;
 
         return switch (face) {
-            case SOUTH -> getRot(0);
-            case SOUTH_SOUTH_EAST -> getRot(1);
-            case SOUTH_EAST -> getRot(2);
-            case EAST_SOUTH_EAST -> getRot(3);
-            case EAST -> getRot(4);
-            case EAST_NORTH_EAST -> getRot(5);
-            case NORTH_EAST -> getRot(6);
-            case NORTH_NORTH_EAST -> getRot(7);
-            case NORTH -> getRot(8);
-            case NORTH_NORTH_WEST -> getRot(9);
-            case NORTH_WEST -> getRot(10);
-            case WEST_NORTH_WEST -> getRot(11);
-            case WEST -> getRot(12);
-            case WEST_SOUTH_WEST -> getRot(13);
-            case SOUTH_WEST -> getRot(14);
-            case SOUTH_SOUTH_WEST -> getRot(15);
-            default -> getRot(0);
+            case NORTH -> 0;
+            case NORTH_NORTH_WEST -> 1;
+            case NORTH_WEST -> 2;
+            case WEST_NORTH_WEST -> 3;
+            case WEST -> 4;
+            case WEST_SOUTH_WEST -> 5;
+            case SOUTH_WEST -> 6;
+            case SOUTH_SOUTH_WEST -> 7;
+            case SOUTH -> 8;
+            case SOUTH_SOUTH_EAST -> 9;
+            case SOUTH_EAST -> 10;
+            case EAST_SOUTH_EAST -> 11;
+            case EAST -> 12;
+            case EAST_NORTH_EAST -> 13;
+            case NORTH_EAST -> 14;
+            case NORTH_NORTH_EAST -> 15;
+            default -> 0;
         };
     }
 
-    public static Quaternionf getRot(float yaw) {
-        // being drunk is fun (i wasnt drunk but feels like it, wtf did i do)
-        float normalizedYaw = yaw < 0 ? yaw + 360 : yaw;
-        float flippedYaw = (540 - normalizedYaw) % 360;
-        int index = (int) Math.floor((flippedYaw + 11.25f) / 22.5f) % 16;
-        return getRot(index);
+    public static int getRotIndex(float yaw) {
+        yaw = (yaw + 360) % 360;
+        int index = Math.round(yaw / 22.5f);
+        return index % 16;
+    }
+
+    public static int getRotIndex(Quaternionf rotation) {
+        Vector3f euler = rotation.getEulerAnglesXYZ(new Vector3f());
+        return getRotIndex((float) Math.toDegrees(euler.y));
     }
 
     public static Vector3f getPos(BlockData blockdata) {
         // for wall heads, attach to the wall
         if (blockdata instanceof Directional directional)
-            return directional.getFacing().getDirection().toVector3f()
-                    .mul(-0.25f).add(0.0f, 0.25f, 0.0f);
-        return new Vector3f(00f, 00f, 00f);
+            return directional.getFacing().getDirection().toVector3f().mul(-0.25f);
+        return new Vector3f(0f, -0.25f, 0f);
     }
 
     /**

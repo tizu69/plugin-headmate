@@ -11,13 +11,9 @@ import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.Block;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
-import org.bukkit.util.Transformation;
-import org.joml.Vector3d;
-import org.joml.Vector3f;
 
 import dev.tizu.headmate.ThisPlugin;
-import dev.tizu.headmate.util.Config;
-import dev.tizu.headmate.util.Transformers;
+import dev.tizu.headmate.headmate.HeadmateStore;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
@@ -66,56 +62,45 @@ public class Editor {
     }
 
     public static void handleInputMove(Player player, Input input) {
-        var inst = playerEditings.get(player.getUniqueId());
-        if (inst == null)
+        var editorInst = playerEditings.get(player.getUniqueId());
+        if (editorInst == null)
             return;
 
-        var trans = inst.head.getTransformation();
-        var movementOffset = new Vector3d();
-        var rotation = trans.getLeftRotation();
-        var scale = 0f;
-
-        switch (inst.mode) {
+        var headInst = HeadmateStore.get(editorInst.head);
+        switch (editorInst.mode) {
             case MOVE:
                 var yaw = Math.toRadians(player.getYaw());
                 if (input.isForward())
-                    movementOffset.add(-Math.sin(yaw), 0, Math.cos(yaw));
+                    headInst.move((float) -Math.sin(yaw), 0, (float) Math.cos(yaw), true);
                 if (input.isBackward())
-                    movementOffset.add(Math.sin(yaw), 0, -Math.cos(yaw));
+                    headInst.move((float) Math.sin(yaw), 0, (float) -Math.cos(yaw), true);
                 if (input.isLeft())
-                    movementOffset.add(Math.cos(yaw), 0, Math.sin(yaw));
+                    headInst.move((float) Math.cos(yaw), 0, (float) Math.sin(yaw), true);
                 if (input.isRight())
-                    movementOffset.add(-Math.cos(yaw), 0, -Math.sin(yaw));
+                    headInst.move((float) -Math.cos(yaw), 0, (float) -Math.sin(yaw), true);
                 if (input.isJump())
-                    movementOffset.add(0, 0.2, 0);
+                    headInst.move(0, 1, 0, true);
                 if (input.isSprint())
-                    movementOffset.add(0, -0.2, 0);
+                    headInst.move(0, -1, 0, true);
                 break;
             case TRANSFORM:
                 if (input.isForward())
-                    scale += Config.scaleStepSize() * 2f;
+                    headInst.rotateUp();
                 if (input.isBackward())
-                    scale -= Config.scaleStepSize() * 2f;
+                    headInst.rotateDown();
                 if (input.isLeft())
-                    rotation = Transformers.getRot(Transformers.getRotIndex(rotation) - 1);
+                    headInst.rotateLeft();
                 if (input.isRight())
-                    rotation = Transformers.getRot(Transformers.getRotIndex(rotation) + 1);
+                    headInst.rotateRight();
+                if (input.isJump())
+                    headInst.scaleUp();
+                if (input.isSprint())
+                    headInst.scaleDown();
                 break;
         }
         player.setFlying(false);
 
-        float previousScale = trans.getScale().x;
-        float newScale = Math.min(Math.max(previousScale + scale, Config.minSideLength() * 2f),
-                Config.maxSideLength() * 2f);
-        float scaleOffset = (newScale - previousScale) / 2f;
-
-        var transPos = trans.getTranslation();
-        transPos.add(Transformers.turnIntoGenericOffset(movementOffset, Config.movementStepSize()))
-                .add(0, scaleOffset, 0).min(new Vector3f(Config.anchorDistanceLimit()))
-                .max(new Vector3f(-Config.anchorDistanceLimit()));
-
-        inst.head.setTransformation(new Transformation(transPos, rotation,
-                new Vector3f(newScale), trans.getRightRotation()));
+        HeadmateStore.set(editorInst.head, headInst);
     }
 
     public static void handleInputControl(Player player, Input input) {

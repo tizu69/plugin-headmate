@@ -13,9 +13,6 @@ import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.util.Transformation;
-import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import dev.tizu.headmate.ThisPlugin;
@@ -27,8 +24,21 @@ import net.kyori.adventure.text.format.NamedTextColor;
 
 public class HeadmateStore {
     public static boolean has(Block block) {
-        var pdc = block.getChunk().getPersistentDataContainer();
-        return pdc.has(getKey(block), PersistentDataType.LIST.strings());
+        var entities = block.getWorld().getNearbyEntities(block.getLocation(), 0.1, 0.1, 0.1);
+        return entities.stream().anyMatch(e -> e instanceof ItemDisplay ? has((ItemDisplay) e) : false);
+    }
+
+    public static boolean has(ItemDisplay head) {
+        return head.getPersistentDataContainer().has(getKey(), new HeadmateInstanceDataType());
+    }
+
+    public static HeadmateInstance get(ItemDisplay head) {
+        return head.getPersistentDataContainer().get(getKey(), new HeadmateInstanceDataType());
+    }
+
+    public static void set(ItemDisplay head, HeadmateInstance inst) {
+        head.setTransformation(inst.getTransformation());
+        head.getPersistentDataContainer().set(getKey(), new HeadmateInstanceDataType(), inst);
     }
 
     public static ItemDisplay create(Block block) {
@@ -43,41 +53,30 @@ public class HeadmateStore {
                 Transformers.getPos(blockdata), Transformers.getRot(blockdata));
     }
 
-    public static ItemDisplay add(Block block, ResolvableProfile profile, Vector3f position, Quaternionf rotation) {
-        var pdc = block.getChunk().getPersistentDataContainer();
-
-        var list = pdc.get(getKey(block), PersistentDataType.LIST.strings());
-        list = new ArrayList<>(list == null ? new ArrayList<>() : list);
-
+    public static ItemDisplay add(Block block, ResolvableProfile profile, Vector3f position, int rotation) {
         var world = block.getWorld();
-        var loc = block.getLocation().clone().add(0.5, 0.5, 0.5);
 
         // transfer the player head to the item display
         var item = new ItemStack(Material.PLAYER_HEAD);
         if (profile != null)
             item.setData(DataComponentTypes.PROFILE, profile);
 
-        var entity = world.spawnEntity(loc, EntityType.ITEM_DISPLAY, SpawnReason.CUSTOM, (e) -> {
-            var id = (ItemDisplay) e;
-            id.setItemStack(item);
-            id.setTransformation(new Transformation(position, rotation,
-                    new Vector3f(1, 1, 1), new Quaternionf()));
-        });
-        list.add(entity.getUniqueId().toString());
-        pdc.set(getKey(block), PersistentDataType.LIST.strings(), list);
+        var inst = new HeadmateInstance(position.x, position.y, position.z, 0.5f, rotation, 0);
+        var entity = world.spawnEntity(block.getLocation(), EntityType.ITEM_DISPLAY,
+                SpawnReason.CUSTOM, (e) -> {
+                    var de = (ItemDisplay) e;
+                    de.setItemStack(item);
+                    de.addScoreboardTag("headmate");
+                    HeadmateStore.set(de, inst);
+                });
         return (ItemDisplay) entity;
     }
 
     public static ItemDisplay add(Block block, ResolvableProfile profile, float yaw) {
-        return HeadmateStore.add(block, profile, new Vector3f(0f, 0f, 0f),
-                Transformers.getRot(yaw));
+        return add(block, profile, new Vector3f(0f, -0.25f, 0f), Transformers.getRotIndex(-yaw));
     }
 
     public static void remove(Block block, UUID uuid) {
-        var pdc = block.getChunk().getPersistentDataContainer();
-        var list = pdc.get(getKey(block), PersistentDataType.LIST.strings());
-        list.remove(uuid.toString());
-
         var entity = block.getWorld().getEntity(uuid);
         if (entity != null) {
             entity.remove();
@@ -89,81 +88,30 @@ public class HeadmateStore {
                     });
         }
 
-        pdc.set(getKey(block), PersistentDataType.LIST.strings(), list);
-        if (list.isEmpty()) {
-            // yes, this will retry removing all heads, but worth it for only one cleanup
-            // task
-            removeAll(block);
-            return;
-        }
-    }
-
-    public static void removeAll(Block block) {
-        var pdc = block.getChunk().getPersistentDataContainer();
-        var list = pdc.get(getKey(block), PersistentDataType.LIST.strings());
-        for (var uuid : list) {
-            var entity = block.getWorld().getEntity(UUID.fromString(uuid));
-            if (entity != null) {
-                entity.remove();
-                var de = (ItemDisplay) entity;
-                block.getWorld().spawnEntity(de.getLocation(), EntityType.ITEM,
-                        SpawnReason.NATURAL, (e) -> {
-                            var item = (Item) e;
-                            item.setItemStack(de.getItemStack());
-                        });
-            }
-        }
-        pdc.remove(getKey(block));
-        if (block.getType() == Material.STRUCTURE_VOID || block.getType() == Material.BARRIER)
+        if (getCount(block) == 0 && (block.getType() == Material.STRUCTURE_VOID
+                || block.getType() == Material.BARRIER))
             block.setType(Material.AIR);
     }
 
-    public static void removeInvalid(Block block) {
-        var pdc = block.getChunk().getPersistentDataContainer();
-        var list = pdc.get(getKey(block), PersistentDataType.LIST.strings());
-        if (list == null)
-            return;
-
-        for (int i = 0; i < list.size(); i++) {
-            var uuid = UUID.fromString(list.get(i));
-            var entity = block.getWorld().getEntity(uuid);
-            if (entity == null) {
-                list.remove(i);
-                i--;
-            }
-        }
-
-        pdc.set(getKey(block), PersistentDataType.LIST.strings(), list);
-        if (list.isEmpty()) {
-            // yes, this will retry removing all heads, but worth it for only one cleanup
-            // task
-            removeAll(block);
-            return;
-        }
+    public static void removeAll(Block block) {
+        for (var head : getHeads(block))
+            remove(block, head.getUniqueId());
     }
 
     public static ItemDisplay[] getHeads(Block block) {
-        var pdc = block.getChunk().getPersistentDataContainer();
-        var list = pdc.get(getKey(block), PersistentDataType.LIST.strings());
-        if (list == null)
-            return new ItemDisplay[0];
-        var heads = new ItemDisplay[list.size()];
-        for (int i = 0; i < heads.length; i++) {
-            var uuid = UUID.fromString(list.get(i));
-            var entity = block.getWorld().getEntity(uuid);
-            if (entity == null) {
-                heads[i] = null;
+        var entities = block.getWorld().getNearbyEntities(block.getLocation(), 0.1, 0.1, 0.1);
+        var heads = new ArrayList<ItemDisplay>();
+        for (var e : entities) {
+            if (!(e instanceof ItemDisplay ed))
                 continue;
-            }
-            heads[i] = (ItemDisplay) entity;
+            if (HeadmateStore.has(ed))
+                heads.add(ed);
         }
-        return heads;
+        return heads.toArray(new ItemDisplay[0]);
     }
 
     public static int getCount(Block block) {
-        var pdc = block.getChunk().getPersistentDataContainer();
-        var list = pdc.get(getKey(block), PersistentDataType.LIST.strings());
-        return list == null ? 0 : list.size();
+        return getHeads(block).length;
     }
 
     public static void changeHitbox(Player player, Block block) {
@@ -188,8 +136,7 @@ public class HeadmateStore {
         }
     }
 
-    private static NamespacedKey getKey(Block block) {
-        return new NamespacedKey(ThisPlugin.instance,
-                "hm-" + block.getX() + "-" + block.getY() + "-" + block.getZ());
+    private static NamespacedKey getKey() {
+        return new NamespacedKey(ThisPlugin.instance, "head");
     }
 }
