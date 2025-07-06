@@ -59,6 +59,10 @@ public class WandListener implements Listener {
         switch (event.getAction()) {
             case RIGHT_CLICK_BLOCK:
                 switch (offhand.getType()) {
+                    case PAPER:
+                        for (var head : HeadmateStore.getHeads(block))
+                            player.sendMessage(HeadmateStore.get(head).toString());
+                        return;
                     case PLAYER_HEAD:
                         handleCreation(event);
                         return;
