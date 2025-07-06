@@ -36,6 +36,11 @@ public class Editor {
         var instance = new EditorInstance(block, head, EditorMode.MOVE, -1, canFly);
         playerEditings.put(player.getUniqueId(), instance);
         showHowTo(player);
+
+        var hinst = HeadmateStore.get(head);
+        if (hinst.isModified(head.getTransformation()))
+            player.sendMessage(Component.text("This head has been externally modified, editing"
+                    + " may discard some changes!", NamedTextColor.YELLOW));
     }
 
     public static void stopEditing(Player player) {
