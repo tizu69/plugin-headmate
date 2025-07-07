@@ -44,14 +44,18 @@ public class Transformers {
     }
 
     public static int getRotIndex(float yaw) {
-        yaw = (yaw + 360) % 360;
+        yaw = (yaw % 360 + 360) % 360;
         int index = Math.round(yaw / 22.5f);
         return index % 16;
     }
 
+    // TODO: I don't know why or how I am doing this the way I am. Clean up.
     public static int getRotIndex(Quaternionf rotation) {
-        Vector3f euler = rotation.getEulerAnglesXYZ(new Vector3f());
-        return getRotIndex((float) Math.toDegrees(euler.y));
+        Vector3f forward = rotation.transform(new Vector3f(0, 0, -1));
+        float yaw = (float) Math.toDegrees(Math.atan2(forward.x, forward.z));
+        yaw = (yaw % 360 + 360) % 360;
+        int index = Math.round(yaw / 22.5f) % 16;
+        return (index + 8) % 16;
     }
 
     public static Vector3f getPos(BlockData blockdata) {
