@@ -9,17 +9,17 @@ import dev.tizu.headmate.menu.Menu;
 import dev.tizu.headmate.wand.WandListener;
 
 public class ThisPlugin extends JavaPlugin {
-    public static ThisPlugin instance;
+	public static ThisPlugin instance;
 
-    @Override
-    public void onEnable() {
-        saveResource("config.yml", /* replace */ false);
-        saveDefaultConfig();
+	@Override
+	public void onEnable() {
+		saveResource("config.yml", /* replace */ false);
+		saveDefaultConfig();
 
-        instance = this;
-        Bukkit.getPluginManager().registerEvents(new EditorListener(), this);
-        Bukkit.getPluginManager().registerEvents(new HeadmateMigrators.Listeners(), this);
-        Bukkit.getPluginManager().registerEvents(new Menu.MenuListener(), this);
-        Bukkit.getPluginManager().registerEvents(new WandListener(), this);
-    }
+		instance = this;
+		Bukkit.getPluginManager().registerEvents(new EditorListener(), this);
+		Bukkit.getPluginManager().registerEvents(new HeadmateMigrators.Listeners(), this);
+		Bukkit.getPluginManager().registerEvents(new Menu.MenuListener(), this);
+		Bukkit.getPluginManager().registerEvents(new WandListener(), this);
+	}
 }

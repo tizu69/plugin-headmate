@@ -40,4 +40,4 @@ custom block by simply placing it while in pass-through mode.
 
 ## To-do
 
-- scaling should be relative to the face the head is positioned against
+-   scaling should be relative to the face the head is positioned against

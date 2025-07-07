@@ -1,37 +1,37 @@
 on:
-  push:
-    branches:
-      - "*"
+    push:
+        branches:
+            - "*"
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - run: git fetch --prune --unshallow
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - run: git fetch --prune --unshallow
 
-      - name: Set up JDK
-        uses: actions/setup-java@v4
-        with:
-          java-version: "21"
-          distribution: "temurin"
-          architecture: x64
+            - name: Set up JDK
+              uses: actions/setup-java@v4
+              with:
+                  java-version: "21"
+                  distribution: "temurin"
+                  architecture: x64
 
-      - name: Obtain version variables
-        run: |
-          echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-          echo "PREV_VERSION=$(git describe --tags --abbrev=0 | cut -c2-)" >> $GITHUB_ENV
-      - name: Replace version in plugin.yml
-        run: |
-          sed -i "s/^version: <dev>/version: ${PREV_VERSION}-${SHORT_SHA}/" src/main/resources/plugin.yml
+            - name: Obtain version variables
+              run: |
+                  echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+                  echo "PREV_VERSION=$(git describe --tags --abbrev=0 | cut -c2-)" >> $GITHUB_ENV
+            - name: Replace version in plugin.yml
+              run: |
+                  sed -i "s/^version: <dev>/version: ${PREV_VERSION}-${SHORT_SHA}/" src/main/resources/plugin.yml
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-      - name: Build with Gradle
-        run: ./gradlew jar
+            - name: Grant execute permission for gradlew
+              run: chmod +x gradlew
+            - name: Build with Gradle
+              run: ./gradlew jar
 
-      - name: Upload jar
-        uses: actions/upload-artifact@v4
-        with:
-          name: headmate.jar
-          path: build/libs/headmate.jar
+            - name: Upload jar
+              uses: actions/upload-artifact@v4
+              with:
+                  name: headmate.jar
+                  path: build/libs/headmate.jar

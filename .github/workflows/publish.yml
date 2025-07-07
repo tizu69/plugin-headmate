@@ -1,87 +1,87 @@
 on:
-  push:
-    tags:
-      - "v*.*.*"
+    push:
+        tags:
+            - "v*.*.*"
 
 permissions:
-  contents: write
+    contents: write
 
 jobs:
-  publish:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - run: git fetch --prune --unshallow
+    publish:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - run: git fetch --prune --unshallow
 
-      - name: Set up JDK
-        uses: actions/setup-java@v4
-        with:
-          java-version: "21"
-          distribution: "temurin"
-          architecture: x64
+            - name: Set up JDK
+              uses: actions/setup-java@v4
+              with:
+                  java-version: "21"
+                  distribution: "temurin"
+                  architecture: x64
 
-      - name: Obtain version variables
-        run: |
-          echo "PREV_VERSION=$(git describe --tags --abbrev=0 `git rev-list --tags --skip=1 --max-count=1` | cut -c2-)" >> $GITHUB_ENV
-          echo "VERSION=$(git describe --tags --abbrev=0 | cut -c2-)" >> $GITHUB_ENV
-      - name: Replace version in plugin.yml
-        run: |
-          sed -i "s/^version: <dev>/version: ${VERSION}/" src/main/resources/plugin.yml
-      - name: Generate changelog
-        run: |
-          echo -e "**Changes** since v${PREV_VERSION}\n" > changelog.md
-          git log --no-merges --pretty=format:"- %s" v${PREV_VERSION}..v${VERSION} | grep "\[change\]" | sed "s/\s*\[[^]]*\]//g" | tac >> changelog.md
-          echo -e "\nView on GitHub: https://github.com/tizu69/plugin-headmate/compare/v${PREV_VERSION}...v${VERSION}" >> changelog.md
-          echo "CHANGELOG<<EOF" >> "$GITHUB_ENV"
-          cat changelog.md >> "$GITHUB_ENV"
-          echo "EOF" >> "$GITHUB_ENV"
-          echo "$(cat changelog.md)" >> $GITHUB_STEP_SUMMARY
+            - name: Obtain version variables
+              run: |
+                  echo "PREV_VERSION=$(git describe --tags --abbrev=0 `git rev-list --tags --skip=1 --max-count=1` | cut -c2-)" >> $GITHUB_ENV
+                  echo "VERSION=$(git describe --tags --abbrev=0 | cut -c2-)" >> $GITHUB_ENV
+            - name: Replace version in plugin.yml
+              run: |
+                  sed -i "s/^version: <dev>/version: ${VERSION}/" src/main/resources/plugin.yml
+            - name: Generate changelog
+              run: |
+                  echo -e "**Changes** since v${PREV_VERSION}\n" > changelog.md
+                  git log --no-merges --pretty=format:"- %s" v${PREV_VERSION}..v${VERSION} | grep "\[change\]" | sed "s/\s*\[[^]]*\]//g" | tac >> changelog.md
+                  echo -e "\nView on GitHub: https://github.com/tizu69/plugin-headmate/compare/v${PREV_VERSION}...v${VERSION}" >> changelog.md
+                  echo "CHANGELOG<<EOF" >> "$GITHUB_ENV"
+                  cat changelog.md >> "$GITHUB_ENV"
+                  echo "EOF" >> "$GITHUB_ENV"
+                  echo "$(cat changelog.md)" >> $GITHUB_STEP_SUMMARY
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-      - name: Build with Gradle
-        run: ./gradlew jar
+            - name: Grant execute permission for gradlew
+              run: chmod +x gradlew
+            - name: Build with Gradle
+              run: ./gradlew jar
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: v${{ env.VERSION }}
-          name: v${{ env.VERSION }}
-          body_path: changelog.md
-          files: build/libs/headmate.jar
-      - name: Publish to CurseForge
-        uses: itsmeow/curseforge-upload@v1
-        with:
-          token: ${{ secrets.CURSEFORGE_API_TOKEN }}
-          project_id: 1286566
-          game_endpoint: bukkit
-          game_versions: "12988"
-          file_path: build/libs/headmate.jar
-          changelog: ${{ env.CHANGELOG }}
-          release_type: release
-      - name: Publish to Modrinth
-        uses: RubixDev/modrinth-upload@v1
-        with:
-          token: ${{ secrets.MODRINTH_TOKEN }}
-          project_id: AhwqWlyK
-          file_path: build/libs/headmate.jar
-          name: headmate ${{ env.VERSION }}
-          version: ${{ env.VERSION }}
-          changelog: ${{ env.CHANGELOG }}
-          game_versions: 1.21.5
-          loaders: paper,purpur
-          featured: true
-          release_type: release
-      - name: Publish to Hangar
-        uses: benwoo1110/hangar-upload-action@v1
-        with:
-          api_token: ${{ secrets.HANGAR_TOKEN }}
-          slug: "headmate"
-          version: ${{ env.VERSION }}
-          channel: release
-          files: |
-            [{ "path": "build/libs/headmate.jar", "platforms": ["PAPER"] }]
-          platform_dependencies: |
-            { "PAPER": ["1.21"] }
+            - name: Create GitHub Release
+              uses: softprops/action-gh-release@v2
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  tag_name: v${{ env.VERSION }}
+                  name: v${{ env.VERSION }}
+                  body_path: changelog.md
+                  files: build/libs/headmate.jar
+            - name: Publish to CurseForge
+              uses: itsmeow/curseforge-upload@v1
+              with:
+                  token: ${{ secrets.CURSEFORGE_API_TOKEN }}
+                  project_id: 1286566
+                  game_endpoint: bukkit
+                  game_versions: "12988"
+                  file_path: build/libs/headmate.jar
+                  changelog: ${{ env.CHANGELOG }}
+                  release_type: release
+            - name: Publish to Modrinth
+              uses: RubixDev/modrinth-upload@v1
+              with:
+                  token: ${{ secrets.MODRINTH_TOKEN }}
+                  project_id: AhwqWlyK
+                  file_path: build/libs/headmate.jar
+                  name: headmate ${{ env.VERSION }}
+                  version: ${{ env.VERSION }}
+                  changelog: ${{ env.CHANGELOG }}
+                  game_versions: 1.21.5
+                  loaders: paper,purpur
+                  featured: true
+                  release_type: release
+            - name: Publish to Hangar
+              uses: benwoo1110/hangar-upload-action@v1
+              with:
+                  api_token: ${{ secrets.HANGAR_TOKEN }}
+                  slug: "headmate"
+                  version: ${{ env.VERSION }}
+                  channel: release
+                  files: |
+                      [{ "path": "build/libs/headmate.jar", "platforms": ["PAPER"] }]
+                  platform_dependencies: |
+                      { "PAPER": ["1.21"] }
