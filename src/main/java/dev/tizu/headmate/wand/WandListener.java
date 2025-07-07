@@ -44,7 +44,7 @@ public class WandListener implements Listener {
 		if (event.getHand() != EquipmentSlot.HAND)
 			return;
 
-		var rateLimitKey = new NamespacedKey(ThisPlugin.instance, "last-wand-click");
+		var rateLimitKey = new NamespacedKey(ThisPlugin.i(), "last-wand-click");
 		var pdc = player.getPersistentDataContainer();
 		if (pdc.has(rateLimitKey, PersistentDataType.LONG)) {
 			var lastClick = pdc.get(rateLimitKey, PersistentDataType.LONG);
@@ -133,7 +133,7 @@ public class WandListener implements Listener {
 			case LEFT_CLICK_AIR:
 				if (offhand.getType() != Material.LAVA_BUCKET || !player.hasPermission("headmate.wand.reload.use"))
 					return;
-				ThisPlugin.instance.reloadConfig();
+				ThisPlugin.i().reloadConfig();
 				player.sendActionBar(Component.text("Config reloaded!", NamedTextColor.GREEN));
 				break;
 
@@ -152,7 +152,7 @@ public class WandListener implements Listener {
 		if (!HeadmateStore.has(block))
 			return;
 
-		Bukkit.getScheduler().runTaskLater(ThisPlugin.instance,
+		Bukkit.getScheduler().runTaskLater(ThisPlugin.i(),
 				() -> event.getBlock().setType(Material.STRUCTURE_VOID), 1);
 		player.sendActionBar(Component.text(player.hasPermission("headmate.wand.use")
 				? "Use the wand to delete these heads!"
@@ -201,7 +201,6 @@ public class WandListener implements Listener {
 		if (player.getGameMode() == GameMode.SURVIVAL)
 			player.getInventory().getItemInOffHand().subtract();
 		Editor.startEditing(player, block, entity);
-		return;
 	}
 
 	private void spawnParticle(ItemDisplay head, Player player) {

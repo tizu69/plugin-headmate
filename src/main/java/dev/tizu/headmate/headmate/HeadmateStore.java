@@ -23,9 +23,12 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
 public class HeadmateStore {
+	private HeadmateStore() {
+	}
+
 	public static boolean has(Block block) {
 		var entities = block.getWorld().getNearbyEntities(block.getLocation(), 0.1, 0.1, 0.1);
-		return entities.stream().anyMatch(e -> e instanceof ItemDisplay ? has((ItemDisplay) e) : false);
+		return entities.stream().anyMatch(e -> e instanceof ItemDisplay de && has(de));
 	}
 
 	public static boolean has(ItemDisplay head) {
@@ -62,13 +65,12 @@ public class HeadmateStore {
 			item.setData(DataComponentTypes.PROFILE, profile);
 
 		var inst = new HeadmateInstance(position.x, position.y, position.z, 0.5f, rotation, 0);
-		var entity = world.spawnEntity(block.getLocation(), EntityType.ITEM_DISPLAY,
-				SpawnReason.CUSTOM, (e) -> {
-					var de = (ItemDisplay) e;
-					de.setItemStack(item);
-					de.addScoreboardTag("headmate");
-					HeadmateStore.set(de, inst);
-				});
+		var entity = world.spawnEntity(block.getLocation(), EntityType.ITEM_DISPLAY, SpawnReason.CUSTOM, e -> {
+			var de = (ItemDisplay) e;
+			de.setItemStack(item);
+			de.addScoreboardTag("headmate");
+			HeadmateStore.set(de, inst);
+		});
 		return (ItemDisplay) entity;
 	}
 
@@ -81,11 +83,10 @@ public class HeadmateStore {
 		if (entity != null) {
 			entity.remove();
 			var de = (ItemDisplay) entity;
-			block.getWorld().spawnEntity(de.getLocation(), EntityType.ITEM,
-					SpawnReason.NATURAL, (e) -> {
-						var item = (Item) e;
-						item.setItemStack(de.getItemStack());
-					});
+			block.getWorld().spawnEntity(de.getLocation(), EntityType.ITEM, SpawnReason.NATURAL, e -> {
+				var item = (Item) e;
+				item.setItemStack(de.getItemStack());
+			});
 		}
 
 		if (getCount(block) == 0 && (block.getType() == Material.STRUCTURE_VOID
@@ -137,6 +138,6 @@ public class HeadmateStore {
 	}
 
 	private static NamespacedKey getKey() {
-		return new NamespacedKey(ThisPlugin.instance, "head");
+		return new NamespacedKey(ThisPlugin.i(), "head");
 	}
 }

@@ -12,8 +12,11 @@ import dev.tizu.headmate.ThisPlugin;
 import dev.tizu.headmate.util.Transformers;
 
 public class HeadmateMigrators {
+	private HeadmateMigrators() {
+	}
+
 	/** Migrate away from chunk PDC to entity self-contained storage. */
-	public static void m0_selfContainedStorage(ChunkLoadEvent event) {
+	public static void selfContainedStorage(ChunkLoadEvent event) {
 		var pdc = event.getChunk().getPersistentDataContainer();
 		for (var key : pdc.getKeys()) {
 			if (!key.asString().startsWith("headmate:hm-"))
@@ -22,14 +25,14 @@ public class HeadmateMigrators {
 			if (list == null || list.isEmpty())
 				continue;
 
-			ThisPlugin.instance.getLogger().info("Starting migration for " + key.getKey() +
+			ThisPlugin.i().getLogger().info("Starting migration for " + key.getKey() +
 					" in " + event.getWorld().getName() + " (" + list.size() + " heads)");
 
 			for (var uuid : list) {
 				var entity = event.getWorld().getEntity(UUID.fromString(uuid));
 				if (entity == null)
 					continue;
-				ThisPlugin.instance.getLogger().info("Migrating " + uuid + " in " +
+				ThisPlugin.i().getLogger().info("Migrating " + uuid + " in " +
 						event.getWorld().getName());
 				var de = (ItemDisplay) entity;
 				de.addScoreboardTag("headmate");
@@ -51,7 +54,7 @@ public class HeadmateMigrators {
 	public static class Listeners implements Listener {
 		@EventHandler
 		public void onChunkLoad(ChunkLoadEvent event) {
-			m0_selfContainedStorage(event);
+			selfContainedStorage(event);
 		}
 	}
 }

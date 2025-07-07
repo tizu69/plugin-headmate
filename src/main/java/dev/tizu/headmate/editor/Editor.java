@@ -20,7 +20,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 public class Editor {
 	private static Map<UUID, EditorInstance> playerEditings = new HashMap<>();
 
-	private static final NamespacedKey EDITING_KEY = new NamespacedKey(ThisPlugin.instance, "editing");
+	private static final NamespacedKey EDITING_KEY = new NamespacedKey(ThisPlugin.i(), "editing");
 
 	public static void startEditing(Player player, Block block, ItemDisplay head) {
 		stopEditing(player);
@@ -59,7 +59,7 @@ public class Editor {
 	public static void stopEditing(Block block) {
 		for (var entry : playerEditings.entrySet())
 			if (entry.getValue().block.getLocation().equals(block.getLocation()))
-				stopEditing(ThisPlugin.instance.getServer().getPlayer(entry.getKey()));
+				stopEditing(ThisPlugin.i().getServer().getPlayer(entry.getKey()));
 	}
 
 	public static boolean isEditing(Player player) {
@@ -126,7 +126,7 @@ public class Editor {
 		playerEditings.put(player.getUniqueId(), inst.shiftDown(sneakTime));
 
 		player.sendActionBar(Component.text("Hold to save, release to change mode", NamedTextColor.YELLOW));
-		player.getServer().getScheduler().runTaskLater(ThisPlugin.instance, (task) -> {
+		player.getServer().getScheduler().runTaskLater(ThisPlugin.i(), () -> {
 			var current = playerEditings.get(player.getUniqueId());
 			if (current == null || current.shiftDown != sneakTime)
 				return;

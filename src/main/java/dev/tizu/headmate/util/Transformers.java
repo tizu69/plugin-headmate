@@ -9,18 +9,19 @@ import org.joml.Vector3d;
 import org.joml.Vector3f;
 
 public class Transformers {
+	private Transformers() {
+	}
+
 	public static float getRot(int index) {
 		return (float) Math.toRadians(index * 22.5f);
 	}
 
 	public static int getRot(BlockData blockdata) {
-		BlockFace face;
-		if (blockdata instanceof Directional directional)
-			face = directional.getFacing();
-		else if (blockdata instanceof Rotatable rotatable)
-			face = rotatable.getRotation().getOppositeFace();
-		else
-			return 0;
+		BlockFace face = switch (blockdata) {
+			case Directional directional -> directional.getFacing();
+			case Rotatable rotatable -> rotatable.getRotation().getOppositeFace();
+			default -> BlockFace.NORTH;
+		};
 
 		return switch (face) {
 			case NORTH -> 0;

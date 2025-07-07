@@ -9,6 +9,9 @@ import org.joml.Vector3d;
 import dev.tizu.headmate.headmate.HeadmateStore;
 
 public class Locator {
+	private Locator() {
+	}
+
 	public static Vector3d centerOfHead(ItemDisplay head) {
 		var inst = HeadmateStore.get(head);
 		return head.getLocation().toVector().toVector3d()

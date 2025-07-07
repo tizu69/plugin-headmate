@@ -9,7 +9,11 @@ import dev.tizu.headmate.menu.Menu;
 import dev.tizu.headmate.wand.WandListener;
 
 public class ThisPlugin extends JavaPlugin {
-	public static ThisPlugin instance;
+	private static ThisPlugin instance;
+
+	public static ThisPlugin i() {
+		return instance;
+	}
 
 	@Override
 	public void onEnable() {

@@ -24,7 +24,7 @@ public class MenuList implements Menu {
 	private final Block block;
 
 	public MenuList(Block block) {
-		this.inv = ThisPlugin.instance.getServer().createInventory(this,
+		this.inv = ThisPlugin.i().getServer().createInventory(this,
 				(int) Math.ceil(Config.maxHeads() / 9f) * 9, Component.text("Merged Heads"));
 		this.block = block;
 		render();
@@ -82,7 +82,7 @@ public class MenuList implements Menu {
 	}
 
 	private void close() {
-		Bukkit.getScheduler().runTaskLater(ThisPlugin.instance, (task) -> {
+		Bukkit.getScheduler().runTaskLater(ThisPlugin.i(), () -> {
 			if (this.inv != null)
 				this.inv.close();
 		}, 1);
