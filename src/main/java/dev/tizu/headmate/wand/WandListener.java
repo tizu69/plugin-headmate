@@ -49,7 +49,7 @@ public class WandListener implements Listener {
         if (pdc.has(rateLimitKey, PersistentDataType.LONG)) {
             var lastClick = pdc.get(rateLimitKey, PersistentDataType.LONG);
             var deltaClick = System.currentTimeMillis() - lastClick;
-            if (deltaClick < 250 && deltaClick > 0)
+            if (deltaClick < 250 && deltaClick >= 0)
                 return;
         }
         pdc.set(rateLimitKey, PersistentDataType.LONG, System.currentTimeMillis());
