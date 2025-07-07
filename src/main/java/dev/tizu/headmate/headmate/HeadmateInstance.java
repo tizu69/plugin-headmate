@@ -5,6 +5,7 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import dev.tizu.headmate.util.Config;
+import static dev.tizu.headmate.util.Equals.*;
 import dev.tizu.headmate.util.Transformers;
 
 public class HeadmateInstance {
@@ -52,10 +53,10 @@ public class HeadmateInstance {
      */
     public boolean isModified(Transformation trans) {
         var own = getTransformation();
-        return !own.getTranslation().equals(trans.getTranslation())
-                || !own.getScale().equals(trans.getScale())
-                || !own.getLeftRotation().equals(trans.getLeftRotation())
-                || !own.getRightRotation().equals(trans.getRightRotation());
+        return !nearlyEqual(own.getTranslation(), trans.getTranslation())
+                || !nearlyEqual(own.getScale(), trans.getScale())
+                || !nearlyEqual(own.getLeftRotation(), trans.getLeftRotation())
+                || !nearlyEqual(own.getRightRotation(), trans.getRightRotation());
     }
 
     public HeadmateInstance move(float x, float y, float z) {
