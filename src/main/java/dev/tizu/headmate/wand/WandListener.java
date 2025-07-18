@@ -78,6 +78,8 @@ public class WandListener implements Listener {
 						else
 							break;
 						return;
+					case LAVA_BUCKET:
+						break;
 					default:
 						player.sendActionBar(Component.text("That's not a head!", NamedTextColor.RED));
 						return;
@@ -98,6 +100,9 @@ public class WandListener implements Listener {
 							return;
 						}
 						handleRayClick(event);
+						break;
+					case LAVA_BUCKET: // this falls through from above, too
+						handleRayClickDeletion(event);
 						break;
 					default:
 						player.sendActionBar(
@@ -166,7 +171,7 @@ public class WandListener implements Listener {
 		player.openInventory(new MenuList(block).getInventory());
 	}
 
-	private void handleRayClick(PlayerInteractEvent event) {
+	private ItemDisplay getRayHead(PlayerInteractEvent event) {
 		var player = event.getPlayer();
 
 		var considerations = player.getNearbyEntities(10, 10, 10).stream()
@@ -177,19 +182,36 @@ public class WandListener implements Listener {
 		if (rotFixed > 0) {
 			player.sendActionBar(Component.text("Migrated " + rotFixed + " externally modified head"
 					+ (rotFixed > 1 ? "s" : "") + ", try again!", NamedTextColor.YELLOW));
-			return;
+			return null;
 		}
 
-		var head = Locator.lookingAt(player.getEyeLocation(), considerations);
+		return Locator.lookingAt(player.getEyeLocation(), considerations);
+	}
+
+	private void handleRayClick(PlayerInteractEvent event) {
+		var player = event.getPlayer();
+		var head = this.getRayHead(event);
 		if (head == null) {
 			player.sendActionBar(
 					Component.text("Could not find head, shift-click to select manually", NamedTextColor.RED));
 			return;
 		}
-
 		var block = head.getWorld().getBlockAt(head.getLocation());
 		Editor.startEditing(player, block, head);
 		spawnParticle(head, player);
+	}
+
+	private void handleRayClickDeletion(PlayerInteractEvent event) {
+		var player = event.getPlayer();
+		var head = this.getRayHead(event);
+		if (head == null) {
+			player.sendActionBar(
+					Component.text("Could not find head to remove, shift-click to select manually",
+							NamedTextColor.RED));
+			return;
+		}
+		var block = head.getWorld().getBlockAt(head.getLocation());
+		HeadmateStore.remove(block, head.getUniqueId());
 	}
 
 	private void handleCreation(PlayerInteractEvent event) {
