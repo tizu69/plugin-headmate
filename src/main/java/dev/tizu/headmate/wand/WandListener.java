@@ -18,6 +18,7 @@ import org.bukkit.persistence.PersistentDataType;
 
 import dev.tizu.headmate.ThisPlugin;
 import dev.tizu.headmate.editor.Editor;
+import dev.tizu.headmate.headmate.HeadmateMigrators;
 import dev.tizu.headmate.headmate.HeadmateStore;
 import dev.tizu.headmate.menu.MenuList;
 import dev.tizu.headmate.util.Config;
@@ -171,6 +172,13 @@ public class WandListener implements Listener {
 		var considerations = player.getNearbyEntities(10, 10, 10).stream()
 				.filter(e -> e instanceof ItemDisplay de && HeadmateStore.has(de))
 				.map(e -> (ItemDisplay) e).toList();
+
+		var rotFixed = HeadmateMigrators.rotationFixes(considerations.toArray(new ItemDisplay[0]));
+		if (rotFixed > 0) {
+			player.sendActionBar(Component.text("Migrated " + rotFixed + " externally modified head"
+					+ (rotFixed > 1 ? "s" : "") + ", try again!", NamedTextColor.YELLOW));
+			return;
+		}
 
 		var head = Locator.lookingAt(player.getEyeLocation(), considerations);
 		if (head == null) {

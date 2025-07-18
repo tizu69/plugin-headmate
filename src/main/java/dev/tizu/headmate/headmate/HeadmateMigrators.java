@@ -1,5 +1,6 @@
 package dev.tizu.headmate.headmate;
 
+import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.entity.ItemDisplay;
@@ -7,6 +8,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.persistence.PersistentDataType;
+import org.joml.Vector3f;
 
 import dev.tizu.headmate.ThisPlugin;
 import dev.tizu.headmate.util.Transformers;
@@ -49,6 +51,64 @@ public class HeadmateMigrators {
 			}
 			pdc.remove(key);
 		}
+	}
+
+	/**
+	 * Migrate one or more heads to fix rotation & position, if applicable. This may
+	 * happen due to WorldEdit or other tools that rotate heads by rotating the
+	 * entity itself.
+	 */
+	public static int rotationFixes(ItemDisplay[] heads) {
+		var yawOffsets = Map.of(
+				0, new Vector3f(0f, 0f, 0f),
+				90, new Vector3f(-1f, 0f, 0f),
+				180, new Vector3f(-1f, 0f, -1f),
+				270, new Vector3f(0f, 0f, -1f));
+
+		var applied = 0;
+		for (var head : heads) {
+			var inst = HeadmateStore.get(head);
+			if (inst == null)
+				continue;
+
+			var posOkay = head.getLocation().equals(head.getLocation().toBlockLocation());
+			var realYaw = (int) head.getYaw();
+			if ((posOkay && realYaw == 0f) || !yawOffsets.containsKey(realYaw))
+				continue;
+
+			applied++;
+			ThisPlugin.i().getLogger().info("Fixing rotation of head at " + head.getLocation());
+
+			if (!posOkay)
+				head.teleport(head.getLocation().toBlockLocation());
+			if (realYaw != 0) {
+				// HACK: a special case for 180 degrees is NOT a good idea probably
+				var yaw = inst.rotH * 22.5f + (realYaw == 180 ? 180 : realYaw - 180);
+
+				// we may need to rotate the offsets for custom rotations (say 45 degrees) too?
+				// TODO: why is this the way it is? this seems odd... well, whatever I guess?
+				var newX = switch (realYaw) {
+					case 90 -> -inst.offsetZ;
+					case 180 -> -inst.offsetX;
+					case 270 -> inst.offsetZ;
+					default -> inst.offsetX;
+				};
+				var newZ = switch (realYaw) {
+					case 90 -> inst.offsetX;
+					case 180 -> -inst.offsetZ;
+					case 270 -> -inst.offsetX;
+					default -> inst.offsetZ;
+				};
+
+				var after = new HeadmateInstance(newX, inst.offsetY, newZ,
+						inst.scale, Transformers.getRotIndex(yaw), 0);
+				HeadmateStore.set(head, after);
+				head.setRotation(0, 0);
+				var offset = yawOffsets.get(realYaw);
+				head.teleport(head.getLocation().add(offset.x, offset.y, offset.z));
+			}
+		}
+		return applied;
 	}
 
 	public static class Listeners implements Listener {
