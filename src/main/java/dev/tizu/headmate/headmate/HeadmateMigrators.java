@@ -73,11 +73,17 @@ public class HeadmateMigrators {
 
 			var posOkay = head.getLocation().equals(head.getLocation().toBlockLocation());
 			var realYaw = (int) head.getYaw();
-			if ((posOkay && realYaw == 0f) || !yawOffsets.containsKey(realYaw))
+			if (posOkay && realYaw == 0f)
 				continue;
 
-			applied++;
 			ThisPlugin.i().getLogger().info("Fixing rotation of head at " + head.getLocation());
+			applied++;
+			if (!yawOffsets.containsKey(realYaw)) {
+				ThisPlugin.i().getLogger().info("Unknown yaw: " + realYaw);
+				HeadmateStore.remove(head.getWorld().getBlockAt((int) head.getX(),
+						(int) head.getY(), (int) head.getZ()), head.getUniqueId());
+				continue;
+			}
 
 			if (!posOkay)
 				head.teleport(head.getLocation().toBlockLocation());
@@ -86,7 +92,6 @@ public class HeadmateMigrators {
 				var yaw = inst.rotH * 22.5f + (realYaw == 180 ? 180 : realYaw - 180);
 
 				// we may need to rotate the offsets for custom rotations (say 45 degrees) too?
-				// TODO: why is this the way it is? this seems odd... well, whatever I guess?
 				var newX = switch (realYaw) {
 					case 90 -> -inst.offsetZ;
 					case 180 -> -inst.offsetX;
