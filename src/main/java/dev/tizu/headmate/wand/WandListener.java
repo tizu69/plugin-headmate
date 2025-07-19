@@ -78,7 +78,7 @@ public class WandListener implements Listener {
 						else
 							break;
 						return;
-					case LAVA_BUCKET:
+					case SHEARS:
 						break;
 					default:
 						player.sendActionBar(Component.text("That's not a head!", NamedTextColor.RED));
@@ -101,7 +101,7 @@ public class WandListener implements Listener {
 						}
 						handleRayClick(event);
 						break;
-					case LAVA_BUCKET: // this falls through from above, too
+					case SHEARS: // this falls through from above, too
 						handleRayClickDeletion(event);
 						break;
 					default:
@@ -113,7 +113,7 @@ public class WandListener implements Listener {
 
 			case LEFT_CLICK_BLOCK:
 				switch (offhand.getType()) {
-					case LAVA_BUCKET:
+					case SHEARS:
 						if (!HeadmateStore.has(block)) {
 							player.sendActionBar(Component.text("Nothing to remove!", NamedTextColor.RED));
 							return;
@@ -131,13 +131,13 @@ public class WandListener implements Listener {
 						}
 					default:
 						player.sendActionBar(Component.text(
-								"Hold lava (to delete) or nothing (change hitbox) in offhand",
+								"Hold shears (to delete) or nothing (change hitbox) in offhand",
 								NamedTextColor.RED));
 						return;
 				}
 				break;
 			case LEFT_CLICK_AIR:
-				if (offhand.getType() != Material.LAVA_BUCKET || !player.hasPermission("headmate.wand.reload.use"))
+				if (offhand.getType() != Material.SHEARS || !player.hasPermission("headmate.wand.reload.use"))
 					return;
 				ThisPlugin.i().reloadConfig();
 				player.sendActionBar(Component.text("Config reloaded!", NamedTextColor.GREEN));
