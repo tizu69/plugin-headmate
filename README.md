@@ -32,7 +32,7 @@ block by doing the same thing you did to create the first head.
 To edit a head you placed earlier, hold nothing and click the head with the
 wand, or shift-click the block to see a list of all the heads in the block. You
 can edit or delete heads from this list. You can alternatively delete all heads
-in the block by Left-clicking with the wand and a Lava Bucket.
+in the block by Left-clicking with the wand and a pair of Shears.
 
 To change the hitbox of the head block, press Left Click while holding the wand.
 This will toggle between a pass-through and a solid block. You can also add a
