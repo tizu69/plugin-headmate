@@ -42,4 +42,7 @@ custom block by simply placing it while in pass-through mode.
 
 Blockmating is an experimental feature that allows you to place blocks just like
 heads. If enabled in the config, you can place a Headmate-style block by holding
-it in your offhand and (shift-)left-clicking with the wand.
+it in your offhand and (shift-)left-clicking with the wand. Blockmates have the
+additional utility of "mini-mode", which allows you to form them as a slab, a
+wall, or even vertical slabs. They do not have collision by default, but you can
+place a real slab block, and the blockmate will cover the texture.
