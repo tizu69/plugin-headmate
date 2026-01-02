@@ -26,8 +26,8 @@ transform mode, you can rotate and scale the head. Press Forward/Backward to
 scale, Left/Right to rotate. Press Sneak to toggle back to move. To save the
 change, hold Sneak for a second.
 
-You can add more heads (this is why it's called merged heads!) to the same
-block by doing the same thing you did to create the first head.
+You can add more heads (this is why it's called merged heads!) to the same block
+by doing the same thing you did to create the first head.
 
 To edit a head you placed earlier, hold nothing and click the head with the
 wand, or shift-click the block to see a list of all the heads in the block. You
@@ -38,6 +38,8 @@ To change the hitbox of the head block, press Left Click while holding the wand.
 This will toggle between a pass-through and a solid block. You can also add a
 custom block by simply placing it while in pass-through mode.
 
-## To-do
+## Experimental: Blockmating
 
--   scaling should be relative to the face the head is positioned against
+Blockmating is an experimental feature that allows you to place blocks just like
+heads. If enabled in the config, you can place a Headmate-style block by holding
+it in your offhand and (shift-)left-clicking with the wand.

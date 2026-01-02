@@ -3,6 +3,7 @@ package dev.tizu.headmate.util;
 import java.util.List;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.ItemDisplay;
 import org.joml.Vector3d;
 
@@ -10,6 +11,10 @@ import dev.tizu.headmate.headmate.HeadmateStore;
 
 public class Locator {
 	private Locator() {
+	}
+
+	private static boolean isHead(ItemDisplay head) {
+		return head.getItemStack().getType() == Material.PLAYER_HEAD;
 	}
 
 	public static Vector3d centerOfHead(ItemDisplay head) {
@@ -21,7 +26,7 @@ public class Locator {
 
 	public static float diameterOfHead(ItemDisplay head) {
 		var inst = HeadmateStore.get(head);
-		return inst.scale;
+		return isHead(head) ? inst.scale : inst.scale * 2;
 	}
 
 	public static ItemDisplay lookingAt(Location player, List<ItemDisplay> considerations) {

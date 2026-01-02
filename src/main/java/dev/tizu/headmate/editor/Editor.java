@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Input;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
@@ -102,6 +103,14 @@ public class Editor {
 				if (input.isSprint())
 					headInst.scaleDown();
 				break;
+			case MINI:
+				if (input.isLeft())
+					headInst.toggleMiniX();
+				if (input.isForward())
+					headInst.toggleMiniY();
+				if (input.isRight())
+					headInst.toggleMiniZ();
+				break;
 		}
 		player.setFlying(false);
 
@@ -114,7 +123,8 @@ public class Editor {
 			return;
 
 		if (!input.isSneak() && inst.shiftDown > 0) {
-			var newInst = inst.mode(inst.mode.next()).shiftDown(-1);
+			var newInst = inst.mode(inst.mode.next(inst.head.getItemStack()
+					.getType() == Material.PLAYER_HEAD)).shiftDown(-1);
 			playerEditings.put(player.getUniqueId(), newInst);
 			showHowTo(player);
 			return;
@@ -132,8 +142,8 @@ public class Editor {
 				return;
 
 			Editor.stopEditing(player);
-			player.sendActionBar(Component.text("Saving... To edit again, shift-click with steve head.",
-					NamedTextColor.GREEN));
+			player.sendActionBar(Component.text("Saving... To edit again," +
+					"(shift-)click with the wand.", NamedTextColor.GREEN));
 		}, 20);
 	}
 
@@ -141,12 +151,12 @@ public class Editor {
 		var instance = playerEditings.get(player.getUniqueId());
 		if (instance == null)
 			return;
-		if (instance.mode == EditorMode.MOVE)
-			player.sendActionBar(Component.text("Move, Jump, Sprint to move, Sneak to save",
-					NamedTextColor.GRAY));
-		else if (instance.mode == EditorMode.TRANSFORM)
-			player.sendActionBar(Component.text("Move to rotate, Jump/Sprint to scale",
-					NamedTextColor.GRAY));
+		var message = switch (instance.mode) {
+			case MOVE -> "Move, Jump, Sprint to move, Sneak to save";
+			case TRANSFORM -> "Move to rotate, Jump/Sprint to scale";
+			case MINI -> "[Block] A/W/D to toggle mini-mode";
+		};
+		player.sendActionBar(Component.text(message, NamedTextColor.GRAY));
 	}
 
 	public record EditorInstance(Block block, ItemDisplay head, EditorMode mode, int shiftDown,
@@ -161,10 +171,19 @@ public class Editor {
 	}
 
 	public enum EditorMode {
-		MOVE, TRANSFORM;
+		MOVE(true), TRANSFORM(true), MINI(false);
 
-		public EditorMode next() {
-			return values()[(this.ordinal() + 1) % values().length];
+		public final boolean headAllow;
+
+		EditorMode(boolean headAllow) {
+			this.headAllow = headAllow;
+		}
+
+		public EditorMode next(boolean head) {
+			var next = values()[(this.ordinal() + 1) % values().length];
+			if (!next.headAllow && head)
+				return next.next(true);
+			return next;
 		}
 	}
 }

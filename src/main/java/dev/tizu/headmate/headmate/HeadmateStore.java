@@ -7,6 +7,7 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.Skull;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemDisplay;
@@ -14,6 +15,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.inventory.ItemStack;
 import org.joml.Vector3f;
+
+import com.destroystokyo.paper.profile.PlayerProfile;
 
 import dev.tizu.headmate.ThisPlugin;
 import dev.tizu.headmate.util.Transformers;
@@ -48,19 +51,23 @@ public class HeadmateStore {
 		if (block.getType() != Material.PLAYER_HEAD && block.getType() != Material.PLAYER_WALL_HEAD)
 			throw new IllegalArgumentException("Invalid block type, got " + block.getType());
 
-		var skull = (Skull) block.getState();
-		var blockdata = skull.getBlockData();
-		var profile = skull.getPlayerProfile();
+		var blockdata = block.getBlockData();
+		PlayerProfile profile = null;
+		if (blockdata instanceof Skull skull)
+			profile = skull.getPlayerProfile();
+
 		block.setType(Material.STRUCTURE_VOID);
-		return HeadmateStore.add(block, profile != null ? ResolvableProfile.resolvableProfile(profile) : null,
+		return HeadmateStore.add(block, block.getType(),
+				profile != null ? ResolvableProfile.resolvableProfile(profile) : null,
 				Transformers.getPos(blockdata), Transformers.getRot(blockdata));
 	}
 
-	public static ItemDisplay add(Block block, ResolvableProfile profile, Vector3f position, int rotation) {
+	public static ItemDisplay add(Block block, Material material, ResolvableProfile profile,
+			Vector3f position, int rotation) {
 		var world = block.getWorld();
 
 		// transfer the player head to the item display
-		var item = new ItemStack(Material.PLAYER_HEAD);
+		var item = new ItemStack(material);
 		if (profile != null)
 			item.setData(DataComponentTypes.PROFILE, profile);
 
@@ -74,8 +81,8 @@ public class HeadmateStore {
 		return (ItemDisplay) entity;
 	}
 
-	public static ItemDisplay add(Block block, ResolvableProfile profile, float yaw) {
-		return add(block, profile, new Vector3f(0f, -0.25f, 0f), Transformers.getRotIndex(-yaw));
+	public static ItemDisplay add(Block block, Material material, ResolvableProfile profile, float yaw) {
+		return add(block, material, profile, new Vector3f(0f, -0.25f, 0f), Transformers.getRotIndex(-yaw));
 	}
 
 	public static void remove(Block block, UUID uuid) {

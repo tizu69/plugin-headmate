@@ -3,4 +3,5 @@ maxSideLength: 1.5
 minSideLength: 0.125
 movementStepSize: 0.0625
 scaleStepSize: 0.125
-maxHeads: 27
+maxHeads: 9
+allowBlockmating: false

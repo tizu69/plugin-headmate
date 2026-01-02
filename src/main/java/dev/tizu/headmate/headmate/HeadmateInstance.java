@@ -14,22 +14,35 @@ public class HeadmateInstance {
 	public float offsetZ = 0;
 	/**
 	 * A head is only half the size of the actual entity, so this scale is divided
-	 * by 2
+	 * by 2. As such, for Blockmates, this is only half of the actual size of the
+	 * displayed block.
 	 */
 	public float scale = 0.5f;
 	public int rotH = 0;
 	public int rotV = 0;
+	public boolean miniX = false;
+	public boolean miniY = false;
+	public boolean miniZ = false;
 
 	protected HeadmateInstance() {
 	}
 
-	public HeadmateInstance(float offsetX, float offsetY, float offsetZ, float scale, int rotH, int rotV) {
+	public HeadmateInstance(float offsetX, float offsetY, float offsetZ, float scale,
+			int rotH, int rotV, boolean miniX, boolean miniY, boolean miniZ) {
 		this.offsetX = offsetX;
 		this.offsetY = offsetY;
 		this.offsetZ = offsetZ;
 		this.scale = scale;
 		this.rotH = rotH;
 		this.rotV = rotV;
+		this.miniX = miniX;
+		this.miniY = miniY;
+		this.miniZ = miniZ;
+	}
+
+	public HeadmateInstance(float offsetX, float offsetY, float offsetZ, float scale,
+			int rotH, int rotV) {
+		this(offsetX, offsetY, offsetZ, scale, rotH, rotV, false, false, false);
 	}
 
 	public Transformation getTransformation() {
@@ -39,10 +52,21 @@ public class HeadmateInstance {
 		float y = (float) (Math.cos(pitch) * (scale / 2f));
 		float z = (float) (Math.cos(yaw) * Math.sin(pitch) * (scale / 2f));
 
+		// if a mini-mode dimension is enabled and no rotation is applied, we
+		// fix Z-fighting so that you can place a real slab etc on the same
+		// block and have it render the blockmate. This is a hack, but it works
+		// just fine, and doesn't mess with headmates, as those can't have mini
+		// mode applied to them.
+		var zFightFix = scale == 0.5f && (miniX || miniY || miniZ)
+				&& rotH % 4 == 0 && rotV % 4 == 0 ? 0.001f : 0;
+		float scaleX = scale * (miniX ? 0.5f : 1) + zFightFix;
+		float scaleY = scale * (miniY ? 0.5f : 1) + zFightFix;
+		float scaleZ = scale * (miniZ ? 0.5f : 1) + zFightFix;
+
 		return new Transformation(
 				new Vector3f(offsetX + 0.5f + x, offsetY + 0.5f + y, offsetZ + 0.5f + z),
 				new Quaternionf().rotateY(yaw).rotateX(pitch),
-				new Vector3f(scale * 2, scale * 2, scale * 2),
+				new Vector3f(scaleX * 2, scaleY * 2, scaleZ * 2),
 				new Quaternionf());
 	}
 
@@ -125,8 +149,30 @@ public class HeadmateInstance {
 		return this.scale(Config.scaleStepSize());
 	}
 
+	public HeadmateInstance toggleMiniX() {
+		this.miniX = !this.miniX;
+		if (this.miniX && this.miniY && this.miniZ)
+			this.miniZ = false;
+		return this;
+	}
+
+	public HeadmateInstance toggleMiniY() {
+		this.miniY = !this.miniY;
+		if (this.miniX && this.miniY && this.miniZ)
+			this.miniX = false;
+		return this;
+	}
+
+	public HeadmateInstance toggleMiniZ() {
+		this.miniZ = !this.miniZ;
+		if (this.miniX && this.miniY && this.miniZ)
+			this.miniY = false;
+		return this;
+	}
+
 	public String toString() {
 		return "Head{ oX=" + this.offsetX + ", oY=" + this.offsetY + ", oZ=" + this.offsetZ +
-				", scale=" + this.scale + ", rotH=" + this.rotH + ", rotV=" + this.rotV + " }";
+				", scale=" + this.scale + ", rotH=" + this.rotH + ", rotV=" + this.rotV +
+				", miniX=" + this.miniX + ", miniY=" + this.miniY + ", miniZ=" + this.miniZ + " }";
 	}
 }

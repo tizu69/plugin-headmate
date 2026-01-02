@@ -64,9 +64,6 @@ public class WandListener implements Listener {
 						for (var head : HeadmateStore.getHeads(block))
 							player.sendMessage(HeadmateStore.get(head).toString());
 						return;
-					case PLAYER_HEAD:
-						handleCreation(event);
-						return;
 					case AIR:
 						if (!player.isSneaking())
 							break;
@@ -81,7 +78,12 @@ public class WandListener implements Listener {
 					case SHEARS:
 						break;
 					default:
-						player.sendActionBar(Component.text("That's not a head!", NamedTextColor.RED));
+						if (Config.allowBlockmating()
+								? offhand.getType().isBlock()
+								: offhand.getType() == Material.PLAYER_HEAD)
+							handleCreation(event);
+						else
+							player.sendActionBar(Component.text("That's not a head!", NamedTextColor.RED));
 						return;
 				}
 			case RIGHT_CLICK_AIR:
@@ -226,10 +228,11 @@ public class WandListener implements Listener {
 
 		if (block.getType() == Material.AIR)
 			block.setType(Material.STRUCTURE_VOID);
-		var profile = player.getInventory().getItemInOffHand().getData(DataComponentTypes.PROFILE);
-		var entity = HeadmateStore.add(block, profile, player.getYaw());
+		var offhand = player.getInventory().getItemInOffHand();
+		var profile = offhand.getData(DataComponentTypes.PROFILE);
+		var entity = HeadmateStore.add(block, offhand.getType(), profile, player.getYaw());
 		if (player.getGameMode() == GameMode.SURVIVAL)
-			player.getInventory().getItemInOffHand().subtract();
+			offhand.subtract();
 		Editor.startEditing(player, block, entity);
 	}
 

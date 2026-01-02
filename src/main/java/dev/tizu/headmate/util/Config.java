@@ -29,4 +29,8 @@ public class Config {
 	public static int maxHeads() {
 		return ThisPlugin.i().getConfig().getInt("maxHeads");
 	}
+
+	public static boolean allowBlockmating() {
+		return ThisPlugin.i().getConfig().getBoolean("allowBlockmating");
+	}
 }
