@@ -15,6 +15,7 @@ import org.bukkit.entity.Player;
 
 import dev.tizu.headmate.ThisPlugin;
 import dev.tizu.headmate.headmate.HeadmateStore;
+import dev.tizu.headmate.util.Equals;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
@@ -39,7 +40,7 @@ public class Editor {
 		showHowTo(player);
 
 		var hinst = HeadmateStore.get(head);
-		if (hinst.isModified(head.getTransformation()))
+		if (hinst.isModified(head.getTransformation(), Equals.isBlock(head)))
 			player.sendMessage(Component.text("This head has been externally modified, editing"
 					+ " may discard some changes!", NamedTextColor.YELLOW));
 	}
@@ -90,6 +91,7 @@ public class Editor {
 					headInst.move(0, -1, 0, true);
 				break;
 			case TRANSFORM:
+				var block = editorInst.head.getItemStack().getType() != Material.PLAYER_HEAD;
 				if (input.isForward())
 					headInst.rotateUp();
 				if (input.isBackward())

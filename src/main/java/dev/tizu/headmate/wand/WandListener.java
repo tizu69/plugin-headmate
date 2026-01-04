@@ -22,6 +22,7 @@ import dev.tizu.headmate.headmate.HeadmateMigrators;
 import dev.tizu.headmate.headmate.HeadmateStore;
 import dev.tizu.headmate.menu.MenuList;
 import dev.tizu.headmate.util.Config;
+import dev.tizu.headmate.util.Equals;
 import dev.tizu.headmate.util.Locator;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import net.kyori.adventure.text.Component;
@@ -78,9 +79,7 @@ public class WandListener implements Listener {
 					case SHEARS:
 						break;
 					default:
-						if (Config.allowBlockmating()
-								? offhand.getType().isBlock()
-								: offhand.getType() == Material.PLAYER_HEAD)
+						if (Equals.validHead(offhand.getType()))
 							handleCreation(event);
 						else
 							player.sendActionBar(Component.text("That's not a head!", NamedTextColor.RED));

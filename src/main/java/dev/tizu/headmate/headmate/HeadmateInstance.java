@@ -45,7 +45,7 @@ public class HeadmateInstance {
 		this(offsetX, offsetY, offsetZ, scale, rotH, rotV, false, false, false);
 	}
 
-	public Transformation getTransformation() {
+	public Transformation getTransformation(boolean isBlock) {
 		var yaw = Transformers.getRot(rotH);
 		var pitch = Transformers.getRot(rotV);
 		float x = (float) (Math.sin(yaw) * Math.sin(pitch) * (scale / 2f));
@@ -59,9 +59,9 @@ public class HeadmateInstance {
 		// mode applied to them.
 		var zFightFix = scale == 0.5f && (miniX || miniY || miniZ)
 				&& rotH % 4 == 0 && rotV % 4 == 0 ? 0.001f : 0;
-		float scaleX = scale * (miniX ? 0.5f : 1) + zFightFix;
-		float scaleY = scale * (miniY ? 0.5f : 1) + zFightFix;
-		float scaleZ = scale * (miniZ ? 0.5f : 1) + zFightFix;
+		float scaleX = scale * (miniX ? 0.5f : 1) * (isBlock ? .5f : 1) + zFightFix;
+		float scaleY = scale * (miniY ? 0.5f : 1) * (isBlock ? .5f : 1) + zFightFix;
+		float scaleZ = scale * (miniZ ? 0.5f : 1) * (isBlock ? .5f : 1) + zFightFix;
 
 		return new Transformation(
 				new Vector3f(offsetX + 0.5f + x, offsetY + 0.5f + y, offsetZ + 0.5f + z),
@@ -75,8 +75,8 @@ public class HeadmateInstance {
 	 * for warning the user that external changes will be lost if modified with
 	 * the Headmate wand.
 	 */
-	public boolean isModified(Transformation trans) {
-		var own = getTransformation();
+	public boolean isModified(Transformation trans, boolean isBlock) {
+		var own = getTransformation(isBlock);
 		return !nearlyEqual(own.getTranslation(), trans.getTranslation())
 				|| !nearlyEqual(own.getScale(), trans.getScale())
 				|| !nearlyEqual(own.getLeftRotation(), trans.getLeftRotation())

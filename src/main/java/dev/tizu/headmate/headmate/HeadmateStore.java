@@ -1,5 +1,7 @@
 package dev.tizu.headmate.headmate;
 
+import static dev.tizu.headmate.util.Equals.isBlock;
+
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -7,7 +9,6 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.Skull;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemDisplay;
@@ -19,6 +20,7 @@ import org.joml.Vector3f;
 import com.destroystokyo.paper.profile.PlayerProfile;
 
 import dev.tizu.headmate.ThisPlugin;
+import dev.tizu.headmate.util.Equals;
 import dev.tizu.headmate.util.Transformers;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.ResolvableProfile;
@@ -43,12 +45,12 @@ public class HeadmateStore {
 	}
 
 	public static void set(ItemDisplay head, HeadmateInstance inst) {
-		head.setTransformation(inst.getTransformation());
+		head.setTransformation(inst.getTransformation(isBlock(head)));
 		head.getPersistentDataContainer().set(getKey(), new HeadmateInstanceDataType(), inst);
 	}
 
 	public static ItemDisplay create(Block block) {
-		if (block.getType() != Material.PLAYER_HEAD && block.getType() != Material.PLAYER_WALL_HEAD)
+		if (!Equals.validHead(block.getType()))
 			throw new IllegalArgumentException("Invalid block type, got " + block.getType());
 
 		var blockdata = block.getBlockData();
@@ -56,8 +58,9 @@ public class HeadmateStore {
 		if (blockdata instanceof Skull skull)
 			profile = skull.getPlayerProfile();
 
+		var type = block.getType();
 		block.setType(Material.STRUCTURE_VOID);
-		return HeadmateStore.add(block, block.getType(),
+		return HeadmateStore.add(block, type,
 				profile != null ? ResolvableProfile.resolvableProfile(profile) : null,
 				Transformers.getPos(blockdata), Transformers.getRot(blockdata));
 	}
@@ -76,6 +79,10 @@ public class HeadmateStore {
 			var de = (ItemDisplay) e;
 			de.setItemStack(item);
 			de.addScoreboardTag("headmate");
+			if (isBlock(de)) {
+				inst.scale *= 2;
+				inst.offsetY *= 2;
+			}
 			HeadmateStore.set(de, inst);
 		});
 		return (ItemDisplay) entity;
