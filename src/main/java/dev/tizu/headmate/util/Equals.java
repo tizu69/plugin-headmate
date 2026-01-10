@@ -6,8 +6,8 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 public class Equals {
-	private Equals() {
-	}
+
+	private Equals() {}
 
 	private static final float EPSILON = 0.0001f;
 
@@ -16,18 +16,20 @@ public class Equals {
 	}
 
 	public static boolean nearlyEqual(Quaternionf a, Quaternionf b) {
-		return Math.abs(a.x - b.x) < EPSILON &&
-				Math.abs(a.y - b.y) < EPSILON &&
-				Math.abs(a.z - b.z) < EPSILON &&
-				Math.abs(a.w - b.w) < EPSILON;
+		return (
+			Math.abs(a.x - b.x) < EPSILON &&
+			Math.abs(a.y - b.y) < EPSILON &&
+			Math.abs(a.z - b.z) < EPSILON &&
+			Math.abs(a.w - b.w) < EPSILON
+		);
 	}
 
 	public static boolean validHead(Material mat) {
-		if (!Config.allowBlockmating())
-			return mat == Material.PLAYER_HEAD;
+		if (!Config.allowBlockmating()) return mat == Material.PLAYER_HEAD;
 
-		if (mat == Material.STRUCTURE_VOID || mat == Material.BARRIER)
-			return false;
+		if (
+			mat == Material.STRUCTURE_VOID || mat == Material.BARRIER
+		) return false;
 		return mat.isBlock();
 	}
 

@@ -1,17 +1,15 @@
 package dev.tizu.headmate.util;
 
+import dev.tizu.headmate.headmate.HeadmateStore;
 import java.util.List;
-
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.ItemDisplay;
 import org.joml.Vector3d;
 
-import dev.tizu.headmate.headmate.HeadmateStore;
-
 public class Locator {
-	private Locator() {
-	}
+
+	private Locator() {}
 
 	private static boolean isHead(ItemDisplay head) {
 		return head.getItemStack().getType() == Material.PLAYER_HEAD;
@@ -19,9 +17,12 @@ public class Locator {
 
 	public static Vector3d centerOfHead(ItemDisplay head) {
 		var inst = HeadmateStore.get(head);
-		return head.getLocation().toVector().toVector3d()
-				.add(0.5f, 0.5f, 0.5f)
-				.add(inst.offsetX, inst.offsetY, inst.offsetZ);
+		return head
+			.getLocation()
+			.toVector()
+			.toVector3d()
+			.add(0.5f, 0.5f, 0.5f)
+			.add(inst.offsetX, inst.offsetY, inst.offsetZ);
 	}
 
 	public static float diameterOfHead(ItemDisplay head) {
@@ -29,7 +30,10 @@ public class Locator {
 		return isHead(head) ? inst.scale : inst.scale * 2;
 	}
 
-	public static ItemDisplay lookingAt(Location player, List<ItemDisplay> considerations) {
+	public static ItemDisplay lookingAt(
+		Location player,
+		List<ItemDisplay> considerations
+	) {
 		var ppos = player.toVector().toVector3d();
 		var pdir = player.getDirection().toVector3d().normalize();
 
@@ -45,8 +49,7 @@ public class Locator {
 			var b = 2.0 * oc.dot(pdir);
 			var c = oc.dot(oc) - hrad * hrad;
 			var discriminant = b * b - 4 * a * c;
-			if (discriminant < 0)
-				continue;
+			if (discriminant < 0) continue;
 
 			var sqrtDiscriminant = Math.sqrt(discriminant);
 			var t1 = (-b - sqrtDiscriminant) / (2 * a);
@@ -60,5 +63,4 @@ public class Locator {
 
 		return target;
 	}
-
 }

@@ -3,11 +3,13 @@ package dev.tizu.headmate.util;
 import dev.tizu.headmate.ThisPlugin;
 
 public class Config {
-	private Config() {
-	}
+
+	private Config() {}
 
 	public static float anchorDistanceLimit() {
-		return (float) ThisPlugin.i().getConfig().getDouble("anchorDistanceLimit");
+		return (float) ThisPlugin.i()
+			.getConfig()
+			.getDouble("anchorDistanceLimit");
 	}
 
 	public static float maxSideLength() {

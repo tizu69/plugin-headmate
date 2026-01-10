@@ -15,11 +15,11 @@ public interface Menu extends InventoryHolder {
 		@EventHandler
 		public void onInventoryClick(InventoryClickEvent event) {
 			var inventory = event.getClickedInventory();
-			if (inventory == null || !(inventory.getHolder(false) instanceof Menu menu))
-				return;
+			if (
+				inventory == null ||
+				!(inventory.getHolder(false) instanceof Menu menu)
+			) return;
 			menu.onInventoryClick(event);
 		}
-
 	}
-
 }

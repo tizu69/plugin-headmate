@@ -1,14 +1,15 @@
 package dev.tizu.headmate.headmate;
 
+import static dev.tizu.headmate.util.Equals.*;
+
+import dev.tizu.headmate.util.Config;
+import dev.tizu.headmate.util.Transformers;
 import org.bukkit.util.Transformation;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
-import dev.tizu.headmate.util.Config;
-import static dev.tizu.headmate.util.Equals.*;
-import dev.tizu.headmate.util.Transformers;
-
 public class HeadmateInstance {
+
 	public float offsetX = 0;
 	public float offsetY = 0;
 	public float offsetZ = 0;
@@ -24,11 +25,19 @@ public class HeadmateInstance {
 	public boolean miniY = false;
 	public boolean miniZ = false;
 
-	protected HeadmateInstance() {
-	}
+	protected HeadmateInstance() {}
 
-	public HeadmateInstance(float offsetX, float offsetY, float offsetZ, float scale,
-			int rotH, int rotV, boolean miniX, boolean miniY, boolean miniZ) {
+	public HeadmateInstance(
+		float offsetX,
+		float offsetY,
+		float offsetZ,
+		float scale,
+		int rotH,
+		int rotV,
+		boolean miniX,
+		boolean miniY,
+		boolean miniZ
+	) {
 		this.offsetX = offsetX;
 		this.offsetY = offsetY;
 		this.offsetZ = offsetZ;
@@ -40,8 +49,14 @@ public class HeadmateInstance {
 		this.miniZ = miniZ;
 	}
 
-	public HeadmateInstance(float offsetX, float offsetY, float offsetZ, float scale,
-			int rotH, int rotV) {
+	public HeadmateInstance(
+		float offsetX,
+		float offsetY,
+		float offsetZ,
+		float scale,
+		int rotH,
+		int rotV
+	) {
 		this(offsetX, offsetY, offsetZ, scale, rotH, rotV, false, false, false);
 	}
 
@@ -57,17 +72,30 @@ public class HeadmateInstance {
 		// block and have it render the blockmate. This is a hack, but it works
 		// just fine, and doesn't mess with headmates, as those can't have mini
 		// mode applied to them.
-		var zFightFix = scale == 0.5f && (miniX || miniY || miniZ)
-				&& rotH % 4 == 0 && rotV % 4 == 0 ? 0.001f : 0;
-		float scaleX = scale * (miniX ? 0.5f : 1) * (isBlock ? .5f : 1) + zFightFix;
-		float scaleY = scale * (miniY ? 0.5f : 1) * (isBlock ? .5f : 1) + zFightFix;
-		float scaleZ = scale * (miniZ ? 0.5f : 1) * (isBlock ? .5f : 1) + zFightFix;
+		var zFightFix =
+			scale == 0.5f &&
+			(miniX || miniY || miniZ) &&
+			rotH % 4 == 0 &&
+			rotV % 4 == 0
+				? 0.001f
+				: 0;
+		float scaleX =
+			scale * (miniX ? 0.5f : 1) * (isBlock ? .5f : 1) + zFightFix;
+		float scaleY =
+			scale * (miniY ? 0.5f : 1) * (isBlock ? .5f : 1) + zFightFix;
+		float scaleZ =
+			scale * (miniZ ? 0.5f : 1) * (isBlock ? .5f : 1) + zFightFix;
 
 		return new Transformation(
-				new Vector3f(offsetX + 0.5f + x, offsetY + 0.5f + y, offsetZ + 0.5f + z),
-				new Quaternionf().rotateY(yaw).rotateX(pitch),
-				new Vector3f(scaleX * 2, scaleY * 2, scaleZ * 2),
-				new Quaternionf());
+			new Vector3f(
+				offsetX + 0.5f + x,
+				offsetY + 0.5f + y,
+				offsetZ + 0.5f + z
+			),
+			new Quaternionf().rotateY(yaw).rotateX(pitch),
+			new Vector3f(scaleX * 2, scaleY * 2, scaleZ * 2),
+			new Quaternionf()
+		);
 	}
 
 	/**
@@ -77,10 +105,12 @@ public class HeadmateInstance {
 	 */
 	public boolean isModified(Transformation trans, boolean isBlock) {
 		var own = getTransformation(isBlock);
-		return !nearlyEqual(own.getTranslation(), trans.getTranslation())
-				|| !nearlyEqual(own.getScale(), trans.getScale())
-				|| !nearlyEqual(own.getLeftRotation(), trans.getLeftRotation())
-				|| !nearlyEqual(own.getRightRotation(), trans.getRightRotation());
+		return (
+			!nearlyEqual(own.getTranslation(), trans.getTranslation()) ||
+			!nearlyEqual(own.getScale(), trans.getScale()) ||
+			!nearlyEqual(own.getLeftRotation(), trans.getLeftRotation()) ||
+			!nearlyEqual(own.getRightRotation(), trans.getRightRotation())
+		);
 	}
 
 	public HeadmateInstance move(float x, float y, float z) {
@@ -93,25 +123,38 @@ public class HeadmateInstance {
 
 	/**
 	 * If xyz is positive, add one step, if negative, subtract one step.
-	 * 
+	 *
 	 * @param largestOnly If true, only move the largest component.
 	 */
-	public HeadmateInstance move(float x, float y, float z, boolean largestOnly) {
+	public HeadmateInstance move(
+		float x,
+		float y,
+		float z,
+		boolean largestOnly
+	) {
 		var one = Config.movementStepSize();
 
-		if (!largestOnly)
-			return this.move(Math.signum(x) * one, Math.signum(y) * one, Math.signum(z) * one);
+		if (!largestOnly) return this.move(
+			Math.signum(x) * one,
+			Math.signum(y) * one,
+			Math.signum(z) * one
+		);
 
 		var absX = Math.abs(x);
 		var absY = Math.abs(y);
 		var absZ = Math.abs(z);
 
-		if (absX >= absY && absX >= absZ)
-			return this.move(Math.signum(x) * one, 0, 0);
-		else if (absY >= absX && absY >= absZ)
-			return this.move(0, Math.signum(y) * one, 0);
-		else
-			return this.move(0, 0, Math.signum(z) * one);
+		if (absX >= absY && absX >= absZ) return this.move(
+			Math.signum(x) * one,
+			0,
+			0
+		);
+		else if (absY >= absX && absY >= absZ) return this.move(
+			0,
+			Math.signum(y) * one,
+			0
+		);
+		else return this.move(0, 0, Math.signum(z) * one);
 	}
 
 	public HeadmateInstance rotateSet(int h, int v) {
@@ -137,7 +180,11 @@ public class HeadmateInstance {
 	}
 
 	public HeadmateInstance scale(float by) {
-		this.scale = Math.clamp(this.scale + by, Config.minSideLength(), Config.maxSideLength());
+		this.scale = Math.clamp(
+			this.scale + by,
+			Config.minSideLength(),
+			Config.maxSideLength()
+		);
 		return this;
 	}
 
@@ -151,28 +198,43 @@ public class HeadmateInstance {
 
 	public HeadmateInstance toggleMiniX() {
 		this.miniX = !this.miniX;
-		if (this.miniX && this.miniY && this.miniZ)
-			this.miniZ = false;
+		if (this.miniX && this.miniY && this.miniZ) this.miniZ = false;
 		return this;
 	}
 
 	public HeadmateInstance toggleMiniY() {
 		this.miniY = !this.miniY;
-		if (this.miniX && this.miniY && this.miniZ)
-			this.miniX = false;
+		if (this.miniX && this.miniY && this.miniZ) this.miniX = false;
 		return this;
 	}
 
 	public HeadmateInstance toggleMiniZ() {
 		this.miniZ = !this.miniZ;
-		if (this.miniX && this.miniY && this.miniZ)
-			this.miniY = false;
+		if (this.miniX && this.miniY && this.miniZ) this.miniY = false;
 		return this;
 	}
 
 	public String toString() {
-		return "Head{ oX=" + this.offsetX + ", oY=" + this.offsetY + ", oZ=" + this.offsetZ +
-				", scale=" + this.scale + ", rotH=" + this.rotH + ", rotV=" + this.rotV +
-				", miniX=" + this.miniX + ", miniY=" + this.miniY + ", miniZ=" + this.miniZ + " }";
+		return (
+			"Head{ oX=" +
+			this.offsetX +
+			", oY=" +
+			this.offsetY +
+			", oZ=" +
+			this.offsetZ +
+			", scale=" +
+			this.scale +
+			", rotH=" +
+			this.rotH +
+			", rotV=" +
+			this.rotV +
+			", miniX=" +
+			this.miniX +
+			", miniY=" +
+			this.miniY +
+			", miniZ=" +
+			this.miniZ +
+			" }"
+		);
 	}
 }

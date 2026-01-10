@@ -11,8 +11,7 @@ public class EditorListener implements Listener {
 	@EventHandler
 	public void onPlayerInput(PlayerInputEvent event) {
 		var player = event.getPlayer();
-		if (!Editor.isEditing(player))
-			return;
+		if (!Editor.isEditing(player)) return;
 
 		var input = event.getInput();
 		Editor.handleInputMove(player, input);
@@ -28,5 +27,4 @@ public class EditorListener implements Listener {
 	public void onBlockBreak(BlockBreakEvent event) {
 		Editor.stopEditing(event.getBlock());
 	}
-
 }

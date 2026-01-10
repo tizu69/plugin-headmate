@@ -9,8 +9,8 @@ import org.joml.Vector3d;
 import org.joml.Vector3f;
 
 public class Transformers {
-	private Transformers() {
-	}
+
+	private Transformers() {}
 
 	public static float getRot(int index) {
 		return (float) Math.toRadians(index * 22.5f);
@@ -19,7 +19,9 @@ public class Transformers {
 	public static int getRot(BlockData blockdata) {
 		BlockFace face = switch (blockdata) {
 			case Directional directional -> directional.getFacing();
-			case Rotatable rotatable -> rotatable.getRotation().getOppositeFace();
+			case Rotatable rotatable -> rotatable
+				.getRotation()
+				.getOppositeFace();
 			default -> BlockFace.NORTH;
 		};
 
@@ -45,7 +47,7 @@ public class Transformers {
 	}
 
 	public static int getRotIndex(float yaw) {
-		yaw = (yaw % 360 + 360) % 360;
+		yaw = ((yaw % 360) + 360) % 360;
 		int index = Math.round(yaw / 22.5f);
 		return index % 16;
 	}
@@ -54,15 +56,18 @@ public class Transformers {
 	public static int getRotIndex(Quaternionf rotation) {
 		Vector3f forward = rotation.transform(new Vector3f(0, 0, -1));
 		float yaw = (float) Math.toDegrees(Math.atan2(forward.x, forward.z));
-		yaw = (yaw % 360 + 360) % 360;
+		yaw = ((yaw % 360) + 360) % 360;
 		int index = Math.round(yaw / 22.5f) % 16;
 		return (index + 8) % 16;
 	}
 
 	public static Vector3f getPos(BlockData blockdata) {
 		// for wall heads, attach to the wall
-		if (blockdata instanceof Directional directional)
-			return directional.getFacing().getDirection().toVector3f().mul(-0.25f);
+		if (blockdata instanceof Directional directional) return directional
+			.getFacing()
+			.getDirection()
+			.toVector3f()
+			.mul(-0.25f);
 		return new Vector3f(0f, -0.25f, 0f);
 	}
 
