@@ -51,6 +51,9 @@ public class HeadmateStore {
 
 	public static void set(ItemDisplay head, HeadmateInstance inst) {
 		head.setTransformation(inst.getTransformation(isBlock(head)));
+		head.setInterpolationDelay(0);
+		head.setInterpolationDuration(1);
+
 		head
 			.getPersistentDataContainer()
 			.set(getKey(), new HeadmateInstanceDataType(), inst);

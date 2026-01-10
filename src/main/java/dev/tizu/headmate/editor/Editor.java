@@ -117,42 +117,42 @@ public class Editor {
 					(float) Math.cos(yaw),
 					true
 				);
-				if (input.isBackward()) headInst.move(
+				else if (input.isBackward()) headInst.move(
 					(float) Math.sin(yaw),
 					0,
 					(float) -Math.cos(yaw),
 					true
 				);
-				if (input.isLeft()) headInst.move(
+				else if (input.isLeft()) headInst.move(
 					(float) Math.cos(yaw),
 					0,
 					(float) Math.sin(yaw),
 					true
 				);
-				if (input.isRight()) headInst.move(
+				else if (input.isRight()) headInst.move(
 					(float) -Math.cos(yaw),
 					0,
 					(float) -Math.sin(yaw),
 					true
 				);
-				if (input.isJump()) headInst.move(0, 1, 0, true);
-				if (input.isSprint()) headInst.move(0, -1, 0, true);
+				else if (input.isJump()) headInst.move(0, 1, 0, true);
+				else if (input.isSprint()) headInst.move(0, -1, 0, true);
+				else return;
 				break;
 			case TRANSFORM:
-				var block =
-					editorInst.head.getItemStack().getType() !=
-					Material.PLAYER_HEAD;
 				if (input.isForward()) headInst.rotateUp();
-				if (input.isBackward()) headInst.rotateDown();
-				if (input.isLeft()) headInst.rotateLeft();
-				if (input.isRight()) headInst.rotateRight();
-				if (input.isJump()) headInst.scaleUp();
-				if (input.isSprint()) headInst.scaleDown();
+				else if (input.isBackward()) headInst.rotateDown();
+				else if (input.isLeft()) headInst.rotateLeft();
+				else if (input.isRight()) headInst.rotateRight();
+				else if (input.isJump()) headInst.scaleUp();
+				else if (input.isSprint()) headInst.scaleDown();
+				else return;
 				break;
 			case MINI:
 				if (input.isLeft()) headInst.toggleMiniX();
-				if (input.isForward()) headInst.toggleMiniY();
-				if (input.isRight()) headInst.toggleMiniZ();
+				else if (input.isForward()) headInst.toggleMiniY();
+				else if (input.isRight()) headInst.toggleMiniZ();
+				else return;
 				break;
 		}
 		player.setFlying(false);
